@@ -1,5 +1,5 @@
-import 'package:examen_civique/style/app_colors.dart';
-import 'package:examen_civique/style/app_text_styles.dart';
+import 'package:examen_civique/pages/home_page.dart';
+import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
@@ -34,8 +34,11 @@ class MyApp extends StatelessWidget {
         hoverColor: AppColors.neutral200,
         highlightColor: AppColors.neutral200,
         focusColor: AppColors.neutral200,
+        iconButtonTheme: IconButtonThemeData(
+          style: IconButton.styleFrom(splashFactory: NoSplash.splashFactory),
+        ),
       ),
-      home: const Scaffold(body: Center(child: Text('Bonjour!', style: AppTextStyles.regular50))),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

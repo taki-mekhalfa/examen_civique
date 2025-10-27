@@ -64,6 +64,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/launcher_icons/
+    - assets/images/
+    - assets/marianne/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -80,32 +82,52 @@ flutter:
   fonts:
     - family: Inter
       fonts:
-        - asset: assets/fonts/Inter_24pt-Thin.ttf
+        - asset: fonts/Inter/Inter_24pt-Thin.ttf
           weight: 100
-        - asset: assets/fonts/Inter_24pt-ExtraLight.ttf
+        - asset: fonts/Inter/Inter_24pt-ExtraLight.ttf
           weight: 200
-        - asset: assets/fonts/Inter_24pt-Light.ttf
+        - asset: fonts/Inter/Inter_24pt-Light.ttf
           weight: 300
-        - asset: assets/fonts/Inter_24pt-Regular.ttf
+        - asset: fonts/Inter/Inter_24pt-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Inter_24pt-Medium.ttf
+        - asset: fonts/Inter/Inter_24pt-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Inter_24pt-SemiBold.ttf
+        - asset: fonts/Inter/Inter_24pt-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Inter_24pt-Bold.ttf
+        - asset: fonts/Inter/Inter_24pt-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Inter_24pt-ExtraBold.ttf
+        - asset: fonts/Inter/Inter_24pt-ExtraBold.ttf
           weight: 800
-        - asset: assets/fonts/Inter_24pt-Black.ttf
+        - asset: fonts/Inter/Inter_24pt-Black.ttf
           weight: 900
-        - asset: assets/fonts/Inter_24pt-Italic.ttf
+        - asset: fonts/Inter/Inter_24pt-Italic.ttf
           style: italic
           weight: 400
-        - asset: assets/fonts/Inter_24pt-MediumItalic.ttf
+        - asset: fonts/Inter/Inter_24pt-MediumItalic.ttf
           style: italic
           weight: 500
-        - asset: assets/fonts/Inter_24pt-BoldItalic.ttf
+        - asset: fonts/Inter/Inter_24pt-BoldItalic.ttf
           style: italic
           weight: 700
+    - family: NotoSansJP
+      fonts:
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-Thin.ttf
+          weight: 100
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-ExtraLight.ttf
+          weight: 200
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-Light.ttf
+          weight: 300
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-Regular.ttf
+          weight: 400
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-Medium.ttf
+          weight: 500
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-Bold.ttf
+          weight: 700
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-ExtraBold.ttf
+          weight: 800
+        - asset: fonts/Noto_Sans_JP/NotoSansJP-Black.ttf
+          weight: 900
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
