@@ -1,0 +1,5 @@
+flutter_launcher_icons:
+  image_path: "assets/launcher_icons/mon_examen_civique.png"
+  ios: true
+  android: true
+  background_color: "#F5F7FA"
