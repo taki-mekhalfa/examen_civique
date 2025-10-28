@@ -125,7 +125,7 @@ class _Errors extends StatelessWidget {
         ? Container(
             padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 0.0),
             decoration: BoxDecoration(
-              color: AppColors.fluorescentRed,
+              color: AppColors.red,
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Text(
