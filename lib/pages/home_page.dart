@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 7 will be replaced by the number of errors dynamically.
-    final items = buildHomeMenuItems(context, 7);
+    final items = buildHomeMenuItems(context, 0);
 
     return Scaffold(
       backgroundColor: AppColors.primaryGreyLight,
@@ -60,6 +60,7 @@ class HomeScreen extends StatelessWidget {
                     title: item.title,
                     imagePath: item.imageAsset,
                     trailing: item.trailing,
+                    onTap: item.onTap,
                   ),
                 ),
               ],

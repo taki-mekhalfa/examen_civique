@@ -8,18 +8,20 @@ class HomeTile extends StatelessWidget {
     required this.title,
     required this.imagePath,
     this.trailing,
+    this.onTap,
   });
 
   final String title;
   final String imagePath;
   final Widget? trailing;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () => onTap?.call(),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.white,
           padding: EdgeInsets.only(
