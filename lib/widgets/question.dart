@@ -2,34 +2,82 @@ import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
-class QuestionCard extends StatefulWidget {
+class QuestionCard extends StatelessWidget {
   final Question question;
+  final int? selected;
+  final ValueChanged<int> onSelected;
+  final bool showCorrection;
+  final bool compact;
 
-  const QuestionCard({super.key, required this.question});
-
-  @override
-  State<QuestionCard> createState() => _QuestionCardState();
-}
-
-class _QuestionCardState extends State<QuestionCard> {
-  int? _selected;
+  const QuestionCard({
+    super.key,
+    required this.question,
+    required this.onSelected,
+    this.selected,
+    this.showCorrection = false,
+    this.compact = false,
+  });
 
   String _labelFor(int i) => String.fromCharCode(65 + i); // A, B, C, D
 
-  void _toggle(int i) {
-    setState(() {
-      _selected = i;
-    });
+  bool isSelected(int i) {
+    return selected == i;
+  }
+
+  bool isCorrect(int i) {
+    return i == question.answer;
+  }
+
+  Color tileBorderColor(int i) {
+    if (!showCorrection) {
+      return isSelected(i) ? AppColors.primaryNavyBlue : AppColors.transparent;
+    }
+
+    if (isCorrect(i)) return AppColors.correctGreen;
+    if (isSelected(i)) return AppColors.wrongRed;
+    return AppColors.transparent;
+  }
+
+  Color badgeColor(int i) {
+    if (!showCorrection) {
+      return isSelected(i)
+          ? AppColors.primaryNavyBlue
+          : AppColors.primaryGreyOpacity70;
+    }
+
+    if (isCorrect(i)) return AppColors.correctGreen;
+    if (isSelected(i)) return AppColors.wrongRed;
+    return AppColors.primaryGreyOpacity70;
+  }
+
+  Color tileBackgroundColor(int i) {
+    if (!showCorrection) {
+      return AppColors.white;
+    }
+
+    if (isCorrect(i)) return AppColors.softGreen;
+    if (isSelected(i)) return AppColors.softRed;
+    return AppColors.white;
+  }
+
+  Icon? icon(int i) {
+    if (!showCorrection || (!isCorrect(i) && !isSelected(i))) {
+      return null;
+    }
+
+    if (isCorrect(i)) {
+      return const Icon(Icons.check, size: 18, color: AppColors.correctGreen);
+    }
+
+    return const Icon(Icons.close, size: 18, color: AppColors.wrongRed);
   }
 
   @override
   Widget build(BuildContext context) {
-    final q = widget.question;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: const BoxDecoration(color: AppColors.primaryGreyLight),
+      decoration: const BoxDecoration(color: AppColors.transparent),
       child: Column(
         children: [
           Column(
@@ -47,33 +95,32 @@ class _QuestionCardState extends State<QuestionCard> {
                     vertical: 6,
                   ),
                   child: Text(
-                    q.topic,
-                    style: AppTextStyles.regular14.copyWith(
+                    question.topic,
+                    style: AppTextStyles.regular13.copyWith(
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 5.0),
               // Question
-              Text(q.text, style: AppTextStyles.regular16),
-              const SizedBox(height: 16),
+              Text(
+                question.text,
+                style: compact
+                    ? AppTextStyles.regular14
+                    : AppTextStyles.regular16,
+              ),
+              const SizedBox(height: 16.0),
               // Choices
               Column(
-                children: List.generate(q.choices.length, (i) {
-                  final isSelected = _selected == i;
+                children: List.generate(question.choices.length, (i) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: ElevatedButton(
-                      onPressed: () => _toggle(i),
+                      onPressed: () => onSelected(i),
                       style: ElevatedButton.styleFrom(
-                        elevation: isSelected ? 0.0 : 1.0,
-                        side: BorderSide(
-                          color: isSelected
-                              ? AppColors.primaryNavyBlue
-                              : AppColors.transparent,
-                          width: 2.0,
-                        ),
+                        elevation: isSelected(i) ? 0.0 : 1.0,
+                        side: BorderSide(color: tileBorderColor(i), width: 2.0),
                         splashFactory: NoSplash.splashFactory,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -82,24 +129,23 @@ class _QuestionCardState extends State<QuestionCard> {
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
+                        backgroundColor: tileBackgroundColor(i),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            width: 35,
-                            height: 35,
+                            width: compact ? 22 : 35,
+                            height: compact ? 22 : 35,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.primaryNavyBlue
-                                  : AppColors.primaryGreyOpacity70,
+                              color: badgeColor(i),
                               borderRadius: const BorderRadius.all(
                                 Radius.circular(5),
                               ),
                             ),
                             child: Text(
                               _labelFor(i),
-                              style: AppTextStyles.medium15.copyWith(
+                              style: AppTextStyles.medium12.copyWith(
                                 color: Colors.white,
                               ),
                             ),
@@ -107,16 +153,30 @@ class _QuestionCardState extends State<QuestionCard> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              q.choices[i],
-                              style: AppTextStyles.regular15,
+                              question.choices[i],
+                              style: compact
+                                  ? AppTextStyles.regular12
+                                  : AppTextStyles.regular14,
                             ),
                           ),
+                          icon(i) ?? const SizedBox.shrink(),
                         ],
                       ),
                     ),
                   );
                 }),
               ),
+              if (showCorrection) ...[
+                const SizedBox(height: 16.0),
+                MarkdownBody(
+                  data: question.explanation,
+                  styleSheet: MarkdownStyleSheet(
+                    p: AppTextStyles.regular14,
+                    strong: AppTextStyles.bold14,
+                    em: AppTextStyles.mediumItalic14,
+                  ),
+                ),
+              ],
             ],
           ),
         ],

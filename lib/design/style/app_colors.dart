@@ -51,6 +51,11 @@ class AppColors {
   static const Color blur = Color(0x123D3C49);
   static const Color gold = Color(0xFFFFD700);
 
+  static const Color correctGreen = Color(0xFF1F8C5A);
+  static const Color wrongRed = Color(0xFFCC3047);
+  static const Color softGreen = Color(0xFFE8F5EC);
+  static const Color softRed = Color(0xFFFDEBEC);
+
   // couleur de badge
   static const Color badgeDepartemental = Color(0xFFFEE7FC);
   static const Color badgeDepartementalTexte = Color(0xFF6E445A);
