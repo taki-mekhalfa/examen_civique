@@ -1,7 +1,9 @@
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/home_tile_item.dart';
+import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/widgets/errors_badge.dart';
+import 'package:examen_civique/widgets/question.dart';
 import 'package:flutter/material.dart';
 
 List<HomeTileItem> buildHomeMenuItems(BuildContext context, int nbErrors) {
@@ -9,6 +11,32 @@ List<HomeTileItem> buildHomeMenuItems(BuildContext context, int nbErrors) {
     HomeTileItem(
       title: 'Séries simples',
       imageAsset: 'assets/images/serie_simple.png',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(title: Text('Séries simples')),
+              body: QuestionCard(
+                question: Question(
+                  id: 1,
+                  text: 'Quelle est la devise de la République française ?',
+                  choices: [
+                    'Liberté, Égalité, Fraternité',
+                    'Unité, Travail, Progrès',
+                    'Paix, Justice, Patrie',
+                    'Liberté, Égalité, Fraternité, Laïcité',
+                  ],
+                  answer: 1,
+                  explanation:
+                      'Inscrite sur les frontons des bâtiments publics.',
+                  topic: 'Institutions',
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     ),
     HomeTileItem(
       title: 'Examens blancs',

@@ -49,8 +49,8 @@ class HomeTile extends StatelessWidget {
               children: [
                 trailing ?? const SizedBox.shrink(),
                 Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.primaryBlue,
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.primaryNavyBlue,
                   size: 20,
                 ),
               ],
