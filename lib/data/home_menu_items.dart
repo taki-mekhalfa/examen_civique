@@ -122,10 +122,6 @@ preuve du droit de résider et d’exercer une activité professionnelle.
       },
     ),
     HomeTileItem(
-      title: 'Séries thématiques',
-      imageAsset: 'assets/images/examen_thematique.png',
-    ),
-    HomeTileItem(
       title: 'Mes erreurs',
       imageAsset: 'assets/images/mes_erreurs.png',
       trailing: ErrorBadge(nbErrors: nbErrors),
