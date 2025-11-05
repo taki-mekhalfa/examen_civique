@@ -9,9 +9,9 @@ import 'package:examen_civique/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+/// Public API unchanged
 class QuizPage extends StatefulWidget {
   final List<Question> questions;
-
   final Duration? timeLimit;
 
   const QuizPage({super.key, required this.questions, this.timeLimit});
@@ -21,32 +21,77 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
+  // ===== Constants
+  static const _snackDuration = Duration(milliseconds: 1500);
+  static const _timerTick = Duration(seconds: 1);
+  static const _lowTimeThreshold = Duration(minutes: 5);
+  // ===== UI Constants
+  static const _progressBarHeight = 8.0;
+  static const _toolbarHeight = 50.0;
+
+  // ===== Question state
   int _currentQuestionIndex = 0;
-  bool _isAnswerValidated = false;
   int? _selectedAnswerIndex;
-
-  // Track all selections and start time
+  bool _isCurrentChoiceValidated = false;
   late final List<int> _selections;
-  late final DateTime _startTime;
 
-  // Timer state (for examens blancs)
+  // ===== Timer state
   Timer? _timer;
   Duration? _remaining;
   bool _isTimeUp = false;
 
+  // ===== Tracking
+  late final DateTime _startTime;
+
+  // ===== UI
   final GlobalKey<ShakeWidgetState> _shakeKey = GlobalKey<ShakeWidgetState>();
+  final _formatter = NumberFormat('00');
 
+  // ===== Computed
   bool get _isTimed => widget.timeLimit != null;
-  bool get _showCorrectAnswer => !_isTimed && _isAnswerValidated;
-
-  final formatter = NumberFormat('00');
+  bool get _isLastQuestion =>
+      _currentQuestionIndex == widget.questions.length - 1;
+  double get _progress => (_currentQuestionIndex + 1) / widget.questions.length;
+  Duration get _safeRemaining => _remaining ?? Duration.zero;
+  bool get _isLowTime => _isTimed && _safeRemaining <= _lowTimeThreshold;
+  bool get _showQuestionCorrectAnswer => !_isTimed && _isCurrentChoiceValidated;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _initializeQuiz();
+  }
 
-    _selections = List.generate(widget.questions.length, (index) => -1);
+  @override
+  void dispose() {
+    _cleanupResources();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Pause/resume timer when app backgrounded/foregrounded
+    if (!_isTimed) return;
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _timer?.cancel();
+    } else if (state == AppLifecycleState.resumed) {
+      if (!_isTimeUp && _safeRemaining > Duration.zero) {
+        _startTimer();
+      }
+    }
+  }
+
+  void _cleanupResources() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+  }
+
+  // ===== Initialization
+  void _initializeQuiz() {
+    _selections = List<int>.filled(widget.questions.length, -1);
     _startTime = DateTime.now();
 
     if (_isTimed) {
@@ -55,39 +100,42 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _timer?.cancel();
-    super.dispose();
-  }
-
+  // ===== Timer management
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(_timerTick, (timer) {
       if (!mounted) return;
+
       setState(() {
-        _remaining = _remaining! - const Duration(seconds: 1);
-        if (_remaining! <= Duration.zero) {
+        final next = _safeRemaining - _timerTick;
+        if (next <= Duration.zero) {
           _remaining = Duration.zero;
           _isTimeUp = true;
           _timer?.cancel();
-          _onTimeUp();
+          _handleTimeUp();
+        } else {
+          _remaining = next;
         }
       });
     });
   }
 
-  void _onTimeUp() async {
+  Future<void> _handleTimeUp() async {
     _timer?.cancel();
-
     if (!mounted) return;
 
+    _showTimeUpSnackBar();
+    await Future.delayed(_snackDuration);
+    if (!mounted) return;
+    _navigateToResults();
+  }
+
+  void _showTimeUpSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Center(
           child: Text(
-            "Temps écoulé !",
+            'Temps écoulé !',
             style: AppTextStyles.medium16.copyWith(color: AppColors.white),
             textAlign: TextAlign.center,
           ),
@@ -95,21 +143,55 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
         elevation: 1.0,
         width: 200,
         backgroundColor: AppColors.red,
-        duration: const Duration(milliseconds: 1500),
+        duration: _snackDuration,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
+  }
 
-    // Wait briefly before showing results
-    await Future.delayed(const Duration(milliseconds: 1500));
+  // ===== Answer handling
+  void _onAnswerSelected(int index) {
+    if (_isCurrentChoiceValidated) return;
+    setState(() => _selectedAnswerIndex = index);
+  }
 
+  void _validateCurrentChoiceOrShake() {
+    if (_selectedAnswerIndex == null) {
+      _shakeKey.currentState?.shake();
+      return;
+    }
+    setState(() => _isCurrentChoiceValidated = true);
+  }
+
+  void _continueOrShake() {
+    if (_selectedAnswerIndex == null) {
+      _shakeKey.currentState?.shake();
+      return;
+    }
+
+    _selections[_currentQuestionIndex] = _selectedAnswerIndex!;
+
+    if (_isLastQuestion) {
+      _navigateToResults();
+    } else {
+      setState(() {
+        _currentQuestionIndex++;
+        _selectedAnswerIndex = null;
+        _isCurrentChoiceValidated = false;
+      });
+    }
+  }
+
+  void _navigateToResults() {
+    // Prevent duplicate navigations
     if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => ResultPage(
-          series: 1,
+          series: 1, // TODO: wire real series value when available
           questions: widget.questions,
           selections: _selections,
           duration: DateTime.now().difference(_startTime),
@@ -118,108 +200,31 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
     );
   }
 
-  void _markSelectedAnswer() {
-    _selections[_currentQuestionIndex] = _selectedAnswerIndex!;
-  }
-
-  void _onValidateAnswer() {
-    setState(() {
-      _isAnswerValidated = true;
-      _markSelectedAnswer();
-    });
-  }
-
-  void _onNextQuestion() {
-    final isLastQuestion = _currentQuestionIndex == widget.questions.length - 1;
-
-    if (isLastQuestion) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultPage(
-            series: 1,
-            questions: widget.questions,
-            selections: _selections,
-            duration: DateTime.now().difference(_startTime),
-          ),
-        ),
-      );
-
-      return;
-    }
-
-    setState(() {
-      _currentQuestionIndex++;
-      _selectedAnswerIndex = null;
-      _isAnswerValidated = false;
-    });
-  }
-
+  // ===== Formatting
   String _formatDuration(Duration d) {
     final hours = d.inHours;
     final minutes = d.inMinutes.remainder(60);
     final seconds = d.inSeconds.remainder(60);
-
-    // Show HH:MM:SS if > 59 minutes; otherwise MM:SS
     if (hours > 0) {
-      return '${formatter.format(hours)}:${formatter.format(minutes)}:${formatter.format(seconds)}';
+      return '${_formatter.format(hours)}:${_formatter.format(minutes)}:${_formatter.format(seconds)}';
     }
-    return '${formatter.format(minutes)}:${formatter.format(seconds)}';
+    return '${_formatter.format(minutes)}:${_formatter.format(seconds)}';
   }
 
+  // ===== UI
   @override
   Widget build(BuildContext context) {
-    final total = widget.questions.length;
-    final progress = (_currentQuestionIndex + 1) / total;
-    final isLowTime = _isTimed && _remaining! <= const Duration(minutes: 5);
-
     return PopScope(
       canPop: false,
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0.0,
-          scrolledUnderElevation: 0,
-          toolbarHeight: 50.0,
-          centerTitle: true,
-          title: Text(
-            'Série 1 - Q${formatter.format(_currentQuestionIndex + 1)}/${formatter.format(total)}',
-            style: AppTextStyles.regular16,
-          ),
-          leading: IconButton(
-            onPressed: () => _showExitDialog(context),
-            icon: const Icon(Icons.close),
-            color: AppColors.primaryGrey,
-            iconSize: 25,
-          ),
-          actions: [
-            if (_isTimed)
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.timer_outlined, size: 25),
-                    const SizedBox(width: 4.0),
-                    Text(
-                      _formatDuration(_remaining!),
-                      style: AppTextStyles.medium16.copyWith(
-                        color: isLowTime
-                            ? AppColors.red
-                            : AppColors.primaryGrey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4.0),
-            child: LinearProgressIndicator(
-              value: progress,
-              color: AppColors.primaryNavyBlue,
-              backgroundColor: AppColors.divider,
-              minHeight: 8.0,
-            ),
-          ),
+        appBar: _QuizAppBar(
+          title:
+              'Série 1 - Q${_formatter.format(_currentQuestionIndex + 1)}/${_formatter.format(widget.questions.length)}',
+          progress: _progress,
+          isTimed: _isTimed,
+          remainingText: _formatDuration(_safeRemaining),
+          isLowTime: _isLowTime,
+          onClosePressed: () => _showExitDialog(context),
         ),
         body: AbsorbPointer(
           absorbing: _isTimeUp,
@@ -232,100 +237,21 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
             child: Column(
               children: [
                 Expanded(
-                  child: Stack(
-                    children: [
-                      ListView(
-                        children: [
-                          ShakeWidget(
-                            key: _shakeKey,
-                            child: QuestionCard(
-                              question: widget.questions[_currentQuestionIndex],
-                              onSelected: (index) {
-                                if (_isAnswerValidated) return;
-                                setState(() {
-                                  _selectedAnswerIndex = index;
-                                });
-                              },
-                              selected: _selectedAnswerIndex,
-                              showCorrection: _showCorrectAnswer,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        height: 50.0, // height of fade
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.primaryGreyLight.withAlpha(0),
-                                AppColors.primaryGreyLight.withAlpha(200),
-                                AppColors.primaryGreyLight,
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: _QuestionSection(
+                    question: widget.questions[_currentQuestionIndex],
+                    onSelected: _onAnswerSelected,
+                    selected: _selectedAnswerIndex,
+                    showCorrection: _showQuestionCorrectAnswer,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 16.0,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Require an answer selection before proceeding
-                      if (_selectedAnswerIndex == null) {
-                        _shakeKey.currentState?.shake();
-                        return;
-                      }
-
-                      if (_isTimed) {
-                        _markSelectedAnswer();
-                        _onNextQuestion();
-                        return;
-                      }
-
-                      _isAnswerValidated
-                          ? _onNextQuestion()
-                          : _onValidateAnswer();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryNavyBlue,
-                      elevation: 0.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 0.0,
-                        vertical: 8.0,
-                      ),
-                      child: SizedBox(
-                        width: 90.0,
-                        child: Center(
-                          child: Text(
-                            _isTimed
-                                ? "Continuer"
-                                : (_isAnswerValidated
-                                      ? "Continuer"
-                                      : "Valider"),
-                            style: AppTextStyles.regular18.copyWith(
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                const SizedBox(height: 8),
+                _PrimaryButton(
+                  text: (_isTimed || _isCurrentChoiceValidated)
+                      ? 'Continuer'
+                      : 'Valider',
+                  onPressed: (_isTimed || _isCurrentChoiceValidated)
+                      ? _continueOrShake
+                      : _validateCurrentChoiceOrShake,
                 ),
               ],
             ),
@@ -334,67 +260,253 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
       ),
     );
   }
+
+  // ===== Dialogs
+  void _showExitDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Center(
+          child: Text(
+            'Souhaites-tu vraiment quitter ?',
+            style: AppTextStyles.medium20,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        backgroundColor: AppColors.primaryGreyLight,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 20.0,
+          vertical: 24.0,
+        ),
+        content: Container(
+          decoration: const BoxDecoration(color: Colors.transparent),
+          child: const Text(
+            'Si tu quittes maintenant, ton progrès sera perdu.',
+            style: AppTextStyles.regular14,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        actions: [
+          _DialogButton(
+            text: 'Oui',
+            color: AppColors.red,
+            onPressed: () {
+              Navigator.pop(context); // close dialog
+              Navigator.pop(context); // exit quiz
+            },
+          ),
+          _DialogButton(
+            text: 'Non',
+            color: AppColors.primaryNavyBlue,
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-void _showExitDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Center(
-        child: const Text(
-          "Souhaites-tu vraiment quitter ?",
-          style: AppTextStyles.medium20,
-          textAlign: TextAlign.center,
+// ===== Helper Widgets
+class _QuizAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final double progress;
+  final bool isTimed;
+  final String remainingText;
+  final bool isLowTime;
+  final VoidCallback onClosePressed;
+
+  const _QuizAppBar({
+    required this.title,
+    required this.progress,
+    required this.isTimed,
+    required this.remainingText,
+    required this.isLowTime,
+    required this.onClosePressed,
+  });
+
+  @override
+  Size get preferredSize =>
+      const Size.fromHeight(_QuizPageState._toolbarHeight + 4);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      elevation: 0.0,
+      scrolledUnderElevation: 0,
+      toolbarHeight: _QuizPageState._toolbarHeight,
+      centerTitle: true,
+      title: Text(title, style: AppTextStyles.regular16),
+      leading: IconButton(
+        onPressed: onClosePressed,
+        icon: const Icon(Icons.close),
+        color: AppColors.primaryGrey,
+        iconSize: 25,
+      ),
+      actions: isTimed
+          ? [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.timer_outlined, size: 25),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      remainingText,
+                      style: AppTextStyles.medium16.copyWith(
+                        color: isLowTime
+                            ? AppColors.red
+                            : AppColors.primaryGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ]
+          : null,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(_QuizPageState._progressBarHeight),
+        child: LinearProgressIndicator(
+          value: progress,
+          color: AppColors.primaryNavyBlue,
+          backgroundColor: AppColors.divider,
+          minHeight: _QuizPageState._progressBarHeight,
         ),
       ),
-      backgroundColor: AppColors.primaryGreyLight,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      actionsAlignment: MainAxisAlignment.center,
-      insetPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-      content: Container(
-        decoration: BoxDecoration(color: AppColors.transparent),
-        child: Text(
-          textAlign: TextAlign.center,
-          "Si tu quittes maintenant, ton progrès sera perdu.",
-          style: AppTextStyles.regular14,
+    );
+  }
+}
+
+class _QuestionSection extends StatelessWidget {
+  final Question question;
+  final ValueChanged<int> onSelected;
+  final int? selected;
+  final bool showCorrection;
+
+  const _QuestionSection({
+    required this.question,
+    required this.onSelected,
+    required this.selected,
+    required this.showCorrection,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ListView(
+          children: [
+            ShakeWidget(
+              key: (context.findAncestorStateOfType<_QuizPageState>())
+                  ?._shakeKey,
+              child: QuestionCard(
+                question: question,
+                onSelected: onSelected,
+                selected: selected,
+                showCorrection: showCorrection,
+              ),
+            ),
+          ],
         ),
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: () => {Navigator.pop(context), Navigator.pop(context)},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.red,
-            elevation: 0.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6.0),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 6.0),
-            child: Text(
-              "Oui",
-              style: AppTextStyles.medium16.copyWith(color: AppColors.white),
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryNavyBlue,
-            elevation: 0.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6.0),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 6.0),
-            child: Text(
-              "Non",
-              style: AppTextStyles.medium16.copyWith(color: AppColors.white),
-            ),
-          ),
-        ),
+        const _BottomFade(),
       ],
-    ),
-  );
+    );
+  }
+}
+
+class _BottomFade extends StatelessWidget {
+  const _BottomFade();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: 50.0,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primaryGreyLight.withAlpha(0),
+              AppColors.primaryGreyLight.withAlpha(200),
+              AppColors.primaryGreyLight,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  const _PrimaryButton({required this.text, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryNavyBlue,
+          elevation: 0.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: SizedBox(
+            width: 120.0,
+            child: Center(
+              child: Text(
+                text,
+                style: AppTextStyles.regular18.copyWith(color: AppColors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DialogButton extends StatelessWidget {
+  final String text;
+  final Color color;
+  final VoidCallback onPressed;
+
+  const _DialogButton({
+    required this.text,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        elevation: 0.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+        child: Text(
+          text,
+          style: AppTextStyles.medium16.copyWith(color: AppColors.white),
+        ),
+      ),
+    );
+  }
 }
