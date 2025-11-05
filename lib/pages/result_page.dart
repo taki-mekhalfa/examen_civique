@@ -1,14 +1,13 @@
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
-import 'package:examen_civique/pages/quiz_page.dart';
 import 'package:examen_civique/widgets/question.dart';
 import 'package:flutter/material.dart';
 
 enum ViewMode { corrections, thematiques }
 
 class ResultPage extends StatefulWidget {
-  final int series;
+  final Series series;
   final List<Question> questions;
   final List<int> selections;
   final int correctCount;
@@ -17,11 +16,11 @@ class ResultPage extends StatefulWidget {
   ResultPage({
     super.key,
     required this.series,
-    required this.questions,
     required this.selections,
     required this.duration,
-  }) : correctCount = selections.indexed
-           .where((e) => questions[e.$1].answer == e.$2)
+  }) : questions = series.questions,
+       correctCount = selections.indexed
+           .where((e) => series.questions[e.$1].answer == e.$2)
            .length;
 
   @override
@@ -95,7 +94,7 @@ class _ResultPageState extends State<ResultPage> {
         toolbarHeight: _toolbarHeight,
         centerTitle: true,
         title: Text(
-          'Série ${widget.series} - Résultats',
+          'Série ${widget.series.id} - Résultats',
           style: AppTextStyles.regular18,
         ),
         leading: IconButton(
@@ -190,55 +189,55 @@ class _ResultPageState extends State<ResultPage> {
           const _BottomFade(),
         ],
       ),
-      bottomNavigationBar: _ReplayBar(
-        onReplay: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => QuizPage(
-                questions: widget.questions, // replay same quiz
-              ),
-            ),
-          );
-        },
-      ),
+      // bottomNavigationBar: _ReplayBar(
+      //   onReplay: () {
+      //     Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (_) => QuizPage(
+      //           questions: widget.questions, // replay same quiz
+      //         ),
+      //       ),
+      //     );
+      //   },
+      // ),
     );
   }
 }
 
 // ===== Helper Widgets
-class _ReplayBar extends StatelessWidget {
-  final VoidCallback onReplay;
-  const _ReplayBar({required this.onReplay});
+// class _ReplayBar extends StatelessWidget {
+//   final VoidCallback onReplay;
+//   const _ReplayBar({required this.onReplay});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.primaryGreyLight,
-      child: SafeArea(
-        child: UnconstrainedBox(
-          child: SizedBox(
-            height: 40,
-            child: ElevatedButton(
-              onPressed: onReplay,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryNavyBlue,
-                elevation: 0.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-              child: Text(
-                'Rejouer',
-                style: AppTextStyles.medium15.copyWith(color: AppColors.white),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: AppColors.primaryGreyLight,
+//       child: SafeArea(
+//         child: UnconstrainedBox(
+//           child: SizedBox(
+//             height: 40,
+//             child: ElevatedButton(
+//               onPressed: onReplay,
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: AppColors.primaryNavyBlue,
+//                 elevation: 0.0,
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(8.0),
+//                 ),
+//               ),
+//               child: Text(
+//                 'Rejouer',
+//                 style: AppTextStyles.medium15.copyWith(color: AppColors.white),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _BottomFade extends StatelessWidget {
   const _BottomFade();

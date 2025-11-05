@@ -11,10 +11,12 @@ import 'package:intl/intl.dart';
 
 /// Public API unchanged
 class QuizPage extends StatefulWidget {
-  final List<Question> questions;
+  final Series series;
   final Duration? timeLimit;
+  final List<Question> questions;
 
-  const QuizPage({super.key, required this.questions, this.timeLimit});
+  QuizPage({super.key, required this.series, this.timeLimit})
+    : questions = series.questions;
 
   @override
   State<QuizPage> createState() => _QuizPageState();
@@ -191,8 +193,7 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
       context,
       MaterialPageRoute(
         builder: (context) => ResultPage(
-          series: 1, // TODO: wire real series value when available
-          questions: widget.questions,
+          series: widget.series,
           selections: _selections,
           duration: DateTime.now().difference(_startTime),
         ),
@@ -219,7 +220,7 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
       child: Scaffold(
         appBar: _QuizAppBar(
           title:
-              'Série 1 - Q${_formatter.format(_currentQuestionIndex + 1)}/${_formatter.format(widget.questions.length)}',
+              'Série ${widget.series.id} - Q${_formatter.format(_currentQuestionIndex + 1)}/${_formatter.format(widget.questions.length)}',
           progress: _progress,
           isTimed: _isTimed,
           remainingText: _formatDuration(_safeRemaining),

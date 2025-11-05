@@ -94,6 +94,8 @@ preuve du droit de résider et d’exercer une activité professionnelle.
     ),
   ];
 
+  final series = Series(id: 1, questions: questions);
+
   return [
     HomeTileItem(
       title: 'Séries simples',
@@ -101,9 +103,7 @@ preuve du droit de résider et d’exercer une activité professionnelle.
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => QuizPage(questions: questions),
-          ),
+          MaterialPageRoute(builder: (context) => QuizPage(series: series)),
         );
       },
     ),
@@ -115,10 +115,7 @@ preuve du droit de résider et d’exercer une activité professionnelle.
           context,
           centerFadeScaleRoute(
             CountdownScreen(
-              child: QuizPage(
-                questions: questions,
-                timeLimit: Duration(minutes: 1),
-              ),
+              child: QuizPage(series: series, timeLimit: Duration(minutes: 1)),
             ),
           ),
         );
