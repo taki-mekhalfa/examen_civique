@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 7 will be replaced by the number of errors dynamically.
+    // 0 will be replaced by the number of errors dynamically.
     final items = buildHomeMenuItems(context, 0);
 
     return Scaffold(
