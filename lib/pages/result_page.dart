@@ -1,6 +1,8 @@
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
+import 'package:examen_civique/utils/utils.dart';
+import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/question.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +34,6 @@ class _ResultPageState extends State<ResultPage> {
   static const _cardHPad = EdgeInsets.symmetric(horizontal: 10.0);
   static const _pagePad = EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0);
   static const _toolbarHeight = 50.0;
-  static const _fadeHeight = 50.0;
 
   // ===== State
   final Set<int> _expanded = <int>{};
@@ -186,7 +187,7 @@ class _ResultPageState extends State<ResultPage> {
               ],
             ),
           ),
-          const _BottomFade(),
+          const BottomFade(),
         ],
       ),
       // bottomNavigationBar: _ReplayBar(
@@ -238,32 +239,6 @@ class _ResultPageState extends State<ResultPage> {
 //     );
 //   }
 // }
-
-class _BottomFade extends StatelessWidget {
-  const _BottomFade();
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: _ResultPageState._fadeHeight,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primaryGreyLight.withAlpha(0),
-              AppColors.primaryGreyLight.withAlpha(200),
-              AppColors.primaryGreyLight,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _ScoreCircle extends StatelessWidget {
   final int correct;
@@ -531,15 +506,9 @@ class _TopicTile extends StatelessWidget {
   final _TopicStat stat;
   const _TopicTile({required this.stat});
 
-  Color _barColor(double p) {
-    if (p >= 0.8) return AppColors.correctGreen; // pass threshold
-    if (p >= 0.6) return AppColors.primaryNavyBlue;
-    return AppColors.wrongRed;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final c = _barColor(stat.progress);
+    final barColor = resultBarColor(stat.progress);
     return Card(
       color: AppColors.white,
       elevation: 1.0,
@@ -570,7 +539,7 @@ class _TopicTile extends StatelessWidget {
                   ),
                   child: Text(
                     '${stat.correct}/${stat.total}  •  ${stat.percentage}%',
-                    style: AppTextStyles.medium12.copyWith(color: c),
+                    style: AppTextStyles.medium12.copyWith(color: barColor),
                   ),
                 ),
               ],
@@ -582,7 +551,7 @@ class _TopicTile extends StatelessWidget {
                 value: stat.progress.clamp(0.01, 1.0),
                 minHeight: 8.0,
                 backgroundColor: AppColors.superSilver,
-                color: c,
+                color: barColor,
               ),
             ),
           ],

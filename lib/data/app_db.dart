@@ -104,6 +104,12 @@ class AppDb {
     id INTEGER PRIMARY KEY,
     type INTEGER NOT NULL CHECK (type IN (0, 1)), -- 0 = simple, 1 = exam
     position INTEGER NOT NULL,
+    --- progress indicators
+    last_answers TEXT, -- JSON array of last answers
+    last_score REAL,
+    best_score REAL,
+    attempts_count INTEGER NOT NULL DEFAULT 0,
+
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
   )
 ''';

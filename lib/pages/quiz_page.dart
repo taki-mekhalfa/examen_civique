@@ -4,6 +4,7 @@ import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/result_page.dart';
+import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/question.dart';
 import 'package:examen_civique/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
@@ -412,35 +413,8 @@ class _QuestionSection extends StatelessWidget {
             ),
           ],
         ),
-        const _BottomFade(),
+        const BottomFade(),
       ],
-    );
-  }
-}
-
-class _BottomFade extends StatelessWidget {
-  const _BottomFade();
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: 50.0,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primaryGreyLight.withAlpha(0),
-              AppColors.primaryGreyLight.withAlpha(200),
-              AppColors.primaryGreyLight,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-      ),
     );
   }
 }

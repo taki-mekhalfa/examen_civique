@@ -6,13 +6,13 @@ class HomeTile extends StatelessWidget {
   const HomeTile({
     super.key,
     required this.title,
-    required this.imagePath,
+    this.imagePath,
     this.trailing,
     this.onTap,
   });
 
   final String title;
-  final String imagePath;
+  final String? imagePath;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -40,7 +40,8 @@ class HomeTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Image.asset(imagePath, height: 55.0, width: 55.0),
+                if (imagePath != null)
+                  Image.asset(imagePath!, height: 55.0, width: 55.0),
                 SizedBox(width: 16.0),
                 Text(title, style: AppTextStyles.regular18),
               ],

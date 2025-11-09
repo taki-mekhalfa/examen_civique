@@ -1,4 +1,11 @@
+import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:flutter/material.dart';
+
+Color resultBarColor(double score) {
+  if (score >= 0.8) return AppColors.correctGreen; // pass threshold
+  if (score >= 0.6) return AppColors.primaryNavyBlue;
+  return AppColors.wrongRed;
+}
 
 Route<T> centerFadeScaleRoute<T>(
   Widget child, {
