@@ -2,12 +2,16 @@ import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
+import 'package:examen_civique/pages/quiz_page.dart';
 import 'package:examen_civique/repositories/series_repository.dart';
 import 'package:examen_civique/utils/utils.dart';
+import 'package:examen_civique/widgets/count_down_widget.dart';
 import 'package:examen_civique/widgets/errors_badge.dart';
 import 'package:examen_civique/widgets/home_tile_widget.dart';
 import 'package:examen_civique/widgets/wait_screen.dart';
 import 'package:flutter/material.dart';
+
+const _examTimeLimit = Duration(minutes: 45);
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -99,7 +103,8 @@ class SeriesListScreen extends StatelessWidget {
       body: SafeArea(
         child: FutureGate<List<SeriesProgress>>(
           future: _fetchSeries(),
-          builder: (context, series) => SeriesList(seriesProgress: series),
+          builder: (context, series) =>
+              SeriesList(seriesProgress: series, type: type),
         ),
       ),
     );
@@ -108,8 +113,13 @@ class SeriesListScreen extends StatelessWidget {
 
 class SeriesList extends StatelessWidget {
   final List<SeriesProgress> seriesProgress;
+  final SeriesType type;
 
-  const SeriesList({super.key, required this.seriesProgress});
+  const SeriesList({
+    super.key,
+    required this.seriesProgress,
+    required this.type,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,15 +139,13 @@ class SeriesList extends StatelessWidget {
             ),
           );
         }
+
         final series = seriesProgress[index - 1];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: ElevatedButton(
             style: _buttonStyle,
-            onPressed: () {
-              // TODO: navigate to the selected series detail/play screen
-              // Navigator.push(...);
-            },
+            onPressed: () => _navigateToQuiz(context, series),
             child: Row(
               children: [
                 Expanded(child: _SeriesInfo(series: series)),
@@ -152,6 +160,28 @@ class SeriesList extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _navigateToQuiz(BuildContext context, SeriesProgress series) {
+    final quizPage = FutureGate<Series>(
+      future: _fetchSeriesQuestions(series.id, series.position),
+      builder: (context, series) => QuizPage(
+        series: series,
+        timeLimit: type == SeriesType.exam ? _examTimeLimit : null,
+      ),
+    );
+
+    final route = type == SeriesType.exam
+        ? centerFadeRoute(CountdownScreen(child: quizPage))
+        : MaterialPageRoute(builder: (_) => quizPage);
+
+    Navigator.of(context).push(route);
+  }
+
+  Future<Series> _fetchSeriesQuestions(int id, int position) async {
+    final db = await AppDb.instance.database;
+    final questions = await SeriesRepository(db: db).getSeriesQuestions(id);
+    return Series(id: id, position: position, questions: questions);
   }
 
   static final ButtonStyle _buttonStyle = ElevatedButton.styleFrom(

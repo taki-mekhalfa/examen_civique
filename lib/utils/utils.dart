@@ -7,7 +7,7 @@ Color resultBarColor(double score) {
   return AppColors.wrongRed;
 }
 
-Route<T> centerFadeScaleRoute<T>(
+Route<T> centerFadeRoute<T>(
   Widget child, {
   Duration transitionDuration = const Duration(milliseconds: 400),
 }) => PageRouteBuilder<T>(
