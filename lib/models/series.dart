@@ -35,4 +35,8 @@ class Question {
     required this.explanation,
     required this.topic,
   });
+
+  bool isCorrect(int selectedAnswer) {
+    return answer == selectedAnswer;
+  }
 }

@@ -261,7 +261,6 @@ class _QuestionResultTile extends StatelessWidget {
     required this.onTap,
   });
 
-  bool get _isCorrect => selected == question.answer;
   bool get _isAnswered => selected != -1;
 
   @override
@@ -289,7 +288,7 @@ class _QuestionResultTile extends StatelessWidget {
                     Row(
                       children: [
                         _StatusDot(
-                          isCorrect: _isCorrect,
+                          isCorrect: question.isCorrect(selected),
                           isAnswered: _isAnswered,
                         ),
                         const SizedBox(width: 10.0),

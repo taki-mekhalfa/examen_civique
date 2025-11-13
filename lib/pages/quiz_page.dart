@@ -5,7 +5,7 @@ import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/result_page.dart';
-import 'package:examen_civique/repositories/series_repository.dart';
+import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/question.dart';
@@ -171,10 +171,22 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
     setState(() => _isCurrentChoiceValidated = true);
   }
 
-  void _continueOrShake() {
+  Future<void> _addWrongQuestion(int questionId) async {
+    final db = await AppDb.instance.database;
+    await Repository(db: db).addWrongQuestion(questionId);
+  }
+
+  Future<void> _continueOrShake() async {
     if (_selectedAnswerIndex == null) {
       _shakeKey.currentState?.shake();
       return;
+    }
+
+    // Mark the question as wrong if it's incorrect
+    if (!widget.questions[_currentQuestionIndex].isCorrect(
+      _selectedAnswerIndex!,
+    )) {
+      await _addWrongQuestion(widget.questions[_currentQuestionIndex].id);
     }
 
     _selections[_currentQuestionIndex] = _selectedAnswerIndex!;
@@ -192,9 +204,7 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
 
   Future<void> _saveProgress(double score) async {
     final db = await AppDb.instance.database;
-    await SeriesRepository(
-      db: db,
-    ).updateSeriesProgress(widget.series.id, score);
+    await Repository(db: db).updateSeriesProgress(widget.series.id, score);
   }
 
   Future<void> _navigateToResults() async {

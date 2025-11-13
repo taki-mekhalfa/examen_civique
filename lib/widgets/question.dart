@@ -26,16 +26,12 @@ class QuestionCard extends StatelessWidget {
     return selected == i;
   }
 
-  bool isCorrect(int i) {
-    return i == question.answer;
-  }
-
   Color tileBorderColor(int i) {
     if (!showCorrection) {
       return isSelected(i) ? AppColors.primaryNavyBlue : AppColors.transparent;
     }
 
-    if (isCorrect(i)) return AppColors.correctGreen;
+    if (question.isCorrect(i)) return AppColors.correctGreen;
     if (isSelected(i)) return AppColors.wrongRed;
     return AppColors.transparent;
   }
@@ -47,7 +43,7 @@ class QuestionCard extends StatelessWidget {
           : AppColors.primaryGreyOpacity70;
     }
 
-    if (isCorrect(i)) return AppColors.correctGreen;
+    if (question.isCorrect(i)) return AppColors.correctGreen;
     if (isSelected(i)) return AppColors.wrongRed;
     return AppColors.primaryGreyOpacity70;
   }
@@ -57,17 +53,17 @@ class QuestionCard extends StatelessWidget {
       return AppColors.white;
     }
 
-    if (isCorrect(i)) return AppColors.softGreen;
+    if (question.isCorrect(i)) return AppColors.softGreen;
     if (isSelected(i)) return AppColors.softRed;
     return AppColors.white;
   }
 
   Icon? icon(int i) {
-    if (!showCorrection || (!isCorrect(i) && !isSelected(i))) {
+    if (!showCorrection || (!question.isCorrect(i) && !isSelected(i))) {
       return null;
     }
 
-    if (isCorrect(i)) {
+    if (question.isCorrect(i)) {
       return const Icon(Icons.check, size: 18, color: AppColors.correctGreen);
     }
 

@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:examen_civique/models/series.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SeriesRepository {
+class Repository {
   final Database db;
 
-  SeriesRepository({required this.db});
+  Repository({required this.db});
 
   Future<List<SeriesProgress>> getSeriesProgressByType(int type) async {
     final seriesResult = await db.query(
@@ -53,6 +54,30 @@ class SeriesRepository {
         topic: q['topic'] as String,
       );
     }).toList();
+  }
+
+  Future<void> addWrongQuestion(int questionId) async {
+    await db.insert('wrong_questions', {'question_id': questionId});
+  }
+
+  Future<void> removeWrongQuestion(int questionId) async {
+    await db.delete(
+      'wrong_questions',
+      where: 'question_id = ?',
+      whereArgs: [questionId],
+    );
+  }
+
+  Future<int> getWrongQuestionsCount() async {
+    final countResult = await db.rawQuery(
+      'SELECT COUNT(*) as wqcount FROM wrong_questions',
+    );
+    return countResult.first['wqcount'] as int;
+  }
+
+  Future<List<int>> getWrongQuestions() async {
+    final wrongQuestionsResult = await db.query('wrong_questions');
+    return wrongQuestionsResult.map((w) => w['question_id'] as int).toList();
   }
 }
 

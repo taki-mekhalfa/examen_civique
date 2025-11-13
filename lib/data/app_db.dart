@@ -89,6 +89,7 @@ class AppDb {
     _seriesTable,
     _questionsTable,
     _seriesQuestionsTable,
+    _wrongQuestionsTable,
     _seriesQuestionsIndexOnSeriesId,
     _seriesQuestionsIndexOnQId,
   ];
@@ -131,6 +132,13 @@ class AppDb {
     FOREIGN KEY(series_id) REFERENCES series(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE ON UPDATE CASCADE
   )
+''';
+
+  static const String _wrongQuestionsTable = '''
+CREATE TABLE wrong_questions (
+  question_id INTEGER PRIMARY KEY,
+  FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE ON UPDATE CASCADE
+)
 ''';
 
   static const String _seriesQuestionsIndexOnSeriesId = '''

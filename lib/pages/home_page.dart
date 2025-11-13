@@ -1,10 +1,12 @@
+import 'dart:developer' as developer;
+
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/main.dart';
 import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/quiz_page.dart';
-import 'package:examen_civique/repositories/series_repository.dart';
+import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/count_down_widget.dart';
 import 'package:examen_civique/widgets/errors_badge.dart';
@@ -14,8 +16,38 @@ import 'package:flutter/material.dart';
 
 const _examTimeLimit = Duration(minutes: 45);
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
+  Future<int> _getWrongQuestionsCount() async {
+    final db = await AppDb.instance.database;
+    return Repository(db: db).getWrongQuestionsCount();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,63 +57,126 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: Image(
-                image: AssetImage("assets/marianne/marianne_bonjour.png"),
-                height: 120.0,
-                width: 120.0,
-                semanticLabel: 'Illustration Marianne — Bonjour',
-              ),
-            ),
-            HomeTile(
-              title: 'Séries simples',
-              imagePath: 'assets/images/serie_simple.png',
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SeriesListScreen(
-                      type: SeriesType.simple,
-                      title: 'Séries simples',
-                    ),
-                  ),
-                );
-              },
-            ),
-            HomeTile(
-              title: 'Examens blancs',
-              imagePath: 'assets/images/examen_blanc.png',
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SeriesListScreen(
-                      type: SeriesType.exam,
-                      title: 'Examens blancs',
-                    ),
-                  ),
-                );
-              },
-            ),
-            HomeTile(
-              title: 'Mes erreurs',
-              imagePath: 'assets/images/mes_erreurs.png',
-              trailing: const ErrorBadge(nbErrors: 0),
-              onTap: () {
-                _showNoErrorsDialog(context);
-              },
-            ),
-            const HomeTile(
-              title: 'Statistiques',
-              imagePath: 'assets/images/statistiques.png',
-            ),
-            const HomeTile(
-              title: "L'examen civique ?",
-              imagePath: 'assets/images/a_propos.png',
-            ),
+            _buildHeader(),
+            _buildSimpleSeriesTile(context),
+            _buildExamsTile(context),
+            _buildErrorsTile(context),
+            _buildStatisticsTile(context),
+            _buildAboutTile(context),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildHeader() {
+    return const Padding(
+      padding: EdgeInsets.only(top: 20.0),
+      child: Image(
+        image: AssetImage("assets/marianne/marianne_bonjour.png"),
+        height: 120.0,
+        width: 120.0,
+        semanticLabel: 'Illustration Marianne — Bonjour',
+      ),
+    );
+  }
+
+  Widget _buildSimpleSeriesTile(BuildContext context) {
+    return HomeTile(
+      title: 'Séries simples',
+      imagePath: 'assets/images/serie_simple.png',
+      onTap: () => _navigateToSeriesList(
+        context,
+        type: SeriesType.simple,
+        title: 'Séries simples',
+      ),
+    );
+  }
+
+  Widget _buildExamsTile(BuildContext context) {
+    return HomeTile(
+      title: 'Examens blancs',
+      imagePath: 'assets/images/examen_blanc.png',
+      onTap: () => _navigateToSeriesList(
+        context,
+        type: SeriesType.exam,
+        title: 'Examens blancs',
+      ),
+    );
+  }
+
+  Widget _buildErrorsTile(BuildContext context) {
+    return FutureBuilder<int>(
+      future: _getWrongQuestionsCount(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingErrorsTile();
+        }
+
+        final nbErrors = snapshot.data ?? 0;
+        return _buildErrorsTileWithCount(context, nbErrors);
+      },
+    );
+  }
+
+  Widget _buildLoadingErrorsTile() {
+    return const HomeTile(
+      title: 'Mes erreurs',
+      imagePath: 'assets/images/mes_erreurs.png',
+      trailing: SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+          color: AppColors.primaryNavyBlue,
+          strokeWidth: 3.0,
+          strokeCap: StrokeCap.round,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorsTileWithCount(BuildContext context, int nbErrors) {
+    return HomeTile(
+      title: 'Mes erreurs',
+      imagePath: 'assets/images/mes_erreurs.png',
+      trailing: ErrorBadge(nbErrors: nbErrors),
+      onTap: nbErrors == 0
+          ? () => _showNoErrorsDialog(context)
+          : () => _navigateToErrorsList(context),
+    );
+  }
+
+  Widget _buildStatisticsTile(BuildContext context) {
+    return const HomeTile(
+      title: 'Statistiques',
+      imagePath: 'assets/images/statistiques.png',
+      // TODO: Add onTap handler
+    );
+  }
+
+  Widget _buildAboutTile(BuildContext context) {
+    return const HomeTile(
+      title: "L'examen civique ?",
+      imagePath: 'assets/images/a_propos.png',
+      // TODO: Add onTap handler
+    );
+  }
+
+  void _navigateToSeriesList(
+    BuildContext context, {
+    required SeriesType type,
+    required String title,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => SeriesListScreen(type: type, title: title),
+      ),
+    );
+  }
+
+  void _navigateToErrorsList(BuildContext context) {
+    developer.log('Navigating to errors list screen');
+    // TODO: Implement navigation to errors list screen
   }
 }
 
@@ -98,7 +193,7 @@ class SeriesListScreen extends StatefulWidget {
 class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
   Future<List<SeriesProgress>> _fetchSeries() async {
     final db = await AppDb.instance.database;
-    return SeriesRepository(db: db).getSeriesProgressByType(widget.type.value);
+    return Repository(db: db).getSeriesProgressByType(widget.type.value);
   }
 
   @override
@@ -232,7 +327,7 @@ class SeriesList extends StatelessWidget {
 
   Future<Series> _fetchSeriesQuestions(int id, int position) async {
     final db = await AppDb.instance.database;
-    final questions = await SeriesRepository(db: db).getSeriesQuestions(id);
+    final questions = await Repository(db: db).getSeriesQuestions(id);
     return Series(id: id, position: position, questions: questions);
   }
 
