@@ -206,40 +206,6 @@ class _ResultPageState extends State<ResultPage> {
   }
 }
 
-// ===== Helper Widgets
-// class _ReplayBar extends StatelessWidget {
-//   final VoidCallback onReplay;
-//   const _ReplayBar({required this.onReplay});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       color: AppColors.primaryGreyLight,
-//       child: SafeArea(
-//         child: UnconstrainedBox(
-//           child: SizedBox(
-//             height: 40,
-//             child: ElevatedButton(
-//               onPressed: onReplay,
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: AppColors.primaryNavyBlue,
-//                 elevation: 0.0,
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(8.0),
-//                 ),
-//               ),
-//               child: Text(
-//                 'Rejouer',
-//                 style: AppTextStyles.medium15.copyWith(color: AppColors.white),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class _ScoreCircle extends StatelessWidget {
   final int correct;
   final int total;
@@ -257,17 +223,12 @@ class _ScoreCircle extends StatelessWidget {
           SizedBox(
             height: 70.0,
             width: 70.0,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: _progress),
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.easeOut,
-              builder: (context, value, _) => CircularProgressIndicator(
-                value: value,
-                strokeWidth: 8.0,
-                strokeCap: StrokeCap.round,
-                color: AppColors.primaryNavyBlue,
-                backgroundColor: AppColors.red,
-              ),
+            child: CircularProgressIndicator(
+              value: _progress,
+              strokeWidth: 8.0,
+              strokeCap: StrokeCap.round,
+              color: AppColors.primaryNavyBlue,
+              backgroundColor: AppColors.red,
             ),
           ),
           RichText(

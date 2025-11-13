@@ -3,11 +3,14 @@ import 'dart:developer' as developer;
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/pages/home_page.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
-import 'package:examen_civique/widgets/wait_screen.dart';
+import 'package:examen_civique/widgets/screen_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
+
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +47,7 @@ class MyApp extends StatelessWidget {
           style: IconButton.styleFrom(splashFactory: NoSplash.splashFactory),
         ),
       ),
+      navigatorObservers: [routeObserver],
       home: const InitScreen(),
       debugShowCheckedModeBanner: false,
     );
@@ -67,16 +71,14 @@ class InitScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureGate<void>(
+    return FutureBuilder(
       future: _initApp(),
-      builder: (_, __) => const HomeScreen(),
-      errorBuilder: (ctx, error, retry) => WaitScreen(
-        message: "Erreur d'initialisation :(\nAppuyez pour réessayer.",
-        bottom: ElevatedButton(
-          onPressed: retry,
-          child: const Text('Réessayer'),
-        ),
-      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MarianneWaitingScreen();
+        }
+        return const HomeScreen();
+      },
     );
   }
 }

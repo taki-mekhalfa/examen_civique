@@ -1,11 +1,15 @@
 import 'dart:async';
 
+import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/result_page.dart';
+import 'package:examen_civique/repositories/series_repository.dart';
+import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/question.dart';
+import 'package:examen_civique/widgets/screen_loader.dart';
 import 'package:examen_civique/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -186,9 +190,36 @@ class _QuizPageState extends State<QuizPage> with WidgetsBindingObserver {
     }
   }
 
-  void _navigateToResults() {
-    // Prevent duplicate navigations
-    if (!mounted) return;
+  Future<void> _saveProgress(double score) async {
+    final db = await AppDb.instance.database;
+    await SeriesRepository(
+      db: db,
+    ).updateSeriesProgress(widget.series.id, score);
+  }
+
+  Future<void> _navigateToResults() async {
+    final correct = _selections.indexed
+        .where((e) => widget.questions[e.$1].answer == e.$2)
+        .length;
+    final double score = correct / widget.questions.length;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black12,
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          DialogScreenLoader(),
+    );
+    final navigator = Navigator.of(context);
+
+    await _saveProgress(score);
+
+    await retryForever(() => _saveProgress(score));
+
+    if (!navigator.mounted) return;
+
+    navigator.pop();
 
     Navigator.pushReplacement(
       context,

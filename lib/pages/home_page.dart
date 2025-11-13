@@ -1,6 +1,7 @@
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
+import 'package:examen_civique/main.dart';
 import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/quiz_page.dart';
 import 'package:examen_civique/repositories/series_repository.dart';
@@ -8,7 +9,7 @@ import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/count_down_widget.dart';
 import 'package:examen_civique/widgets/errors_badge.dart';
 import 'package:examen_civique/widgets/home_tile_widget.dart';
-import 'package:examen_civique/widgets/wait_screen.dart';
+import 'package:examen_civique/widgets/screen_loader.dart';
 import 'package:flutter/material.dart';
 
 const _examTimeLimit = Duration(minutes: 45);
@@ -84,27 +85,59 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class SeriesListScreen extends StatelessWidget {
+class SeriesListScreen extends StatefulWidget {
   final SeriesType type;
   final String title;
 
   const SeriesListScreen({super.key, required this.type, required this.title});
 
+  @override
+  State<SeriesListScreen> createState() => _SeriesListScreenState();
+}
+
+class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
   Future<List<SeriesProgress>> _fetchSeries() async {
     final db = await AppDb.instance.database;
-    return SeriesRepository(db: db).getSeriesProgressByType(type.value);
+    return SeriesRepository(db: db).getSeriesProgressByType(widget.type.value);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryGreyLight,
-      appBar: _buildAppBar(title),
+      appBar: _buildAppBar(widget.title),
       body: SafeArea(
-        child: FutureGate<List<SeriesProgress>>(
+        child: FutureBuilder<List<SeriesProgress>>(
           future: _fetchSeries(),
-          builder: (context, series) =>
-              SeriesList(seriesProgress: series, type: type),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const DialogScreenLoader();
+            }
+            return SeriesList(
+              seriesProgress: snapshot.data!,
+              type: widget.type,
+            );
+          },
         ),
       ),
     );
@@ -162,20 +195,39 @@ class SeriesList extends StatelessWidget {
     );
   }
 
-  void _navigateToQuiz(BuildContext context, SeriesProgress series) {
-    final quizPage = FutureGate<Series>(
-      future: _fetchSeriesQuestions(series.id, series.position),
-      builder: (context, series) => QuizPage(
-        series: series,
-        timeLimit: type == SeriesType.exam ? _examTimeLimit : null,
-      ),
+  Future<void> _navigateToQuiz(
+    BuildContext context,
+    SeriesProgress series,
+  ) async {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black12,
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          DialogScreenLoader(),
+    );
+
+    final navigator = Navigator.of(context);
+
+    final fetchedSeries = await retryForever(
+      () => _fetchSeriesQuestions(series.id, series.position),
+    );
+
+    if (!navigator.mounted) return;
+
+    navigator.pop();
+
+    final quizPage = QuizPage(
+      series: fetchedSeries,
+      timeLimit: type == SeriesType.exam ? _examTimeLimit : null,
     );
 
     final route = type == SeriesType.exam
         ? centerFadeRoute(CountdownScreen(child: quizPage))
         : MaterialPageRoute(builder: (_) => quizPage);
 
-    Navigator.of(context).push(route);
+    navigator.push(route);
   }
 
   Future<Series> _fetchSeriesQuestions(int id, int position) async {

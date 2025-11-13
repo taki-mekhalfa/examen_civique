@@ -28,3 +28,20 @@ Route<T> centerFadeRoute<T>(
     );
   },
 );
+
+Future<T> retryForever<T>(
+  Future<T> Function() task, {
+  Duration initialDelay = const Duration(milliseconds: 50),
+  Duration maxDelay = const Duration(seconds: 1),
+}) async {
+  var delay = initialDelay;
+  while (true) {
+    try {
+      return await task();
+    } catch (_) {
+      await Future.delayed(delay);
+      final next = Duration(milliseconds: delay.inMilliseconds * 2);
+      delay = next > maxDelay ? maxDelay : next;
+    }
+  }
+}
