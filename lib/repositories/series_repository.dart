@@ -10,21 +10,25 @@ class SeriesRepository {
   Future<List<SeriesProgress>> getSeriesProgressByType(int type) async {
     final seriesResult = await db.query(
       'series',
-      columns: [
-        'id',
-        'position',
-        'type',
-        'last_answers',
-        'last_score',
-        'best_score',
-        'attempts_count',
-      ],
+      columns: ['id', 'position', 'type', 'last_score', 'best_score'],
       where: 'type = ?',
       whereArgs: [type],
       orderBy: 'position',
     );
 
     return seriesResult.map((s) => SeriesProgress.fromMap(s)).toList();
+  }
+
+  Future<void> updateSeriesProgress(int id, double score) async {
+    await db.rawUpdate(
+      '''
+      UPDATE series
+      SET last_score = ?,
+      best_score = MAX(COALESCE(best_score, 0), ?)
+      WHERE id = ?
+      ''',
+      [score, score, id],
+    );
   }
 
   Future<List<Question>> getSeriesQuestions(int seriesId) async {
@@ -58,8 +62,6 @@ class SeriesProgress {
   final int position;
   final double? lastScore;
   final double? bestScore;
-  final List<int>? lastAnswers;
-  final int attemptsCount;
 
   SeriesProgress({
     required this.id,
@@ -67,22 +69,15 @@ class SeriesProgress {
     required this.position,
     required this.lastScore,
     required this.bestScore,
-    required this.lastAnswers,
-    required this.attemptsCount,
   });
 
   factory SeriesProgress.fromMap(Map<String, Object?> r) {
-    final ansJson = r['last_answers'] as String?;
     return SeriesProgress(
       id: r['id'] as int,
       type: SeriesType.values[r['type'] as int],
       position: r['position'] as int,
       lastScore: (r['last_score'] as num?)?.toDouble(),
       bestScore: (r['best_score'] as num?)?.toDouble(),
-      lastAnswers: ansJson == null
-          ? null
-          : List<int>.from(jsonDecode(ansJson) as List),
-      attemptsCount: (r['attempts_count'] as int?) ?? 0,
     );
   }
 }
