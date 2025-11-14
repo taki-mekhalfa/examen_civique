@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'package:examen_civique/models/series.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -57,7 +56,9 @@ class Repository {
   }
 
   Future<void> addWrongQuestion(int questionId) async {
-    await db.insert('wrong_questions', {'question_id': questionId});
+    await db.insert('wrong_questions', {
+      'question_id': questionId,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
   Future<void> removeWrongQuestion(int questionId) async {
@@ -68,6 +69,10 @@ class Repository {
     );
   }
 
+  Future<void> clearWrongQuestions() async {
+    await db.delete('wrong_questions');
+  }
+
   Future<int> getWrongQuestionsCount() async {
     final countResult = await db.rawQuery(
       'SELECT COUNT(*) as wqcount FROM wrong_questions',
@@ -75,9 +80,20 @@ class Repository {
     return countResult.first['wqcount'] as int;
   }
 
-  Future<List<int>> getWrongQuestions() async {
-    final wrongQuestionsResult = await db.query('wrong_questions');
-    return wrongQuestionsResult.map((w) => w['question_id'] as int).toList();
+  Future<List<Question>> getWrongQuestions() async {
+    final wrongQuestionsResult = await db.rawQuery(
+      'SELECT q.* FROM questions q INNER JOIN wrong_questions wq ON q.id = wq.question_id',
+    );
+    return wrongQuestionsResult.map((q) {
+      return Question(
+        id: q['id'] as int,
+        text: q['text'] as String,
+        choices: List<String>.from(jsonDecode(q['choices'] as String)),
+        answer: q['answer'] as int,
+        explanation: q['explanation'] as String,
+        topic: q['topic'] as String,
+      );
+    }).toList();
   }
 }
 

@@ -1,11 +1,11 @@
-import 'dart:developer' as developer;
-
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/main.dart';
 import 'package:examen_civique/models/series.dart';
-import 'package:examen_civique/pages/quiz_page.dart';
+import 'package:examen_civique/pages/errors_page.dart';
+import 'package:examen_civique/pages/exam_quiz_page.dart';
+import 'package:examen_civique/pages/simple_quiz_page.dart';
 import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/count_down_widget.dart';
@@ -29,6 +29,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     return Repository(db: db).getWrongQuestionsCount();
   }
 
+  late Future<int> _wrongQuestionsCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _wrongQuestionsCount = retryForever(() => _getWrongQuestionsCount());
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -46,14 +54,16 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    setState(() {});
+    setState(() {
+      _wrongQuestionsCount = retryForever(() => _getWrongQuestionsCount());
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryGreyLight,
-      appBar: _buildAppBar('Mon Examen Civique'),
+      appBar: buildAppBar('Mon Examen Civique'),
       body: SafeArea(
         child: ListView(
           children: [
@@ -107,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Widget _buildErrorsTile(BuildContext context) {
     return FutureBuilder<int>(
-      future: _getWrongQuestionsCount(),
+      future: _wrongQuestionsCount,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _buildLoadingErrorsTile();
@@ -142,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       trailing: ErrorBadge(nbErrors: nbErrors),
       onTap: nbErrors == 0
           ? () => _showNoErrorsDialog(context)
-          : () => _navigateToErrorsList(context),
+          : () => _navigateToErrorsPage(context, nbErrors),
     );
   }
 
@@ -174,9 +184,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
   }
 
-  void _navigateToErrorsList(BuildContext context) {
-    developer.log('Navigating to errors list screen');
-    // TODO: Implement navigation to errors list screen
+  _navigateToErrorsPage(BuildContext context, int nbErrors) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => ErrorsPage(nbErrors: nbErrors)));
   }
 }
 
@@ -196,6 +207,14 @@ class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
     return Repository(db: db).getSeriesProgressByType(widget.type.value);
   }
 
+  late Future<List<SeriesProgress>> _series;
+
+  @override
+  void initState() {
+    super.initState();
+    _series = retryForever(() => _fetchSeries());
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -213,17 +232,19 @@ class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    setState(() {});
+    setState(() {
+      _series = retryForever(() => _fetchSeries());
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryGreyLight,
-      appBar: _buildAppBar(widget.title),
+      appBar: buildAppBar(widget.title),
       body: SafeArea(
         child: FutureBuilder<List<SeriesProgress>>(
-          future: _fetchSeries(),
+          future: _series,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const DialogScreenLoader();
@@ -313,13 +334,17 @@ class SeriesList extends StatelessWidget {
 
     navigator.pop();
 
-    final quizPage = QuizPage(
-      series: fetchedSeries,
-      timeLimit: type == SeriesType.exam ? _examTimeLimit : null,
-    );
+    final quizPage = type == SeriesType.exam
+        ? CountdownScreen(
+            child: ExamQuizPage(
+              series: fetchedSeries,
+              timeLimit: _examTimeLimit,
+            ),
+          )
+        : SimpleQuizPage(series: fetchedSeries);
 
     final route = type == SeriesType.exam
-        ? centerFadeRoute(CountdownScreen(child: quizPage))
+        ? centerFadeRoute(quizPage)
         : MaterialPageRoute(builder: (_) => quizPage);
 
     navigator.push(route);
@@ -394,7 +419,7 @@ class _SeriesInfo extends StatelessWidget {
   }
 }
 
-PreferredSizeWidget _buildAppBar(String title) {
+PreferredSizeWidget buildAppBar(String title) {
   return AppBar(
     elevation: 0.0,
     scrolledUnderElevation: 0,
