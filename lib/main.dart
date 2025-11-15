@@ -1,8 +1,10 @@
 import 'dart:developer' as developer;
 
+import 'package:examen_civique/app_time_tracker.dart';
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/pages/home_page.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
+import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/screen_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,6 +61,7 @@ class InitScreen extends StatelessWidget {
 
   Future<void> _initApp() async {
     try {
+      // Initialize the database
       await Future.wait([
         AppDb().database,
         Future.delayed(const Duration(seconds: 1)),
@@ -72,11 +75,15 @@ class InitScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _initApp(),
+      future: retryForever(() => _initApp()),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const MarianneWaitingScreen();
         }
+
+        // Initialize the time tracker
+        AppTimeTracker.instance.init();
+
         return const HomeScreen();
       },
     );

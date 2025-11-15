@@ -90,6 +90,7 @@ class AppDb {
     _questionsTable,
     _seriesQuestionsTable,
     _wrongQuestionsTable,
+    _TimeSpentStatsTable,
     _seriesQuestionsIndexOnSeriesId,
     _seriesQuestionsIndexOnQId,
   ];
@@ -138,6 +139,13 @@ class AppDb {
 CREATE TABLE wrong_questions (
   question_id INTEGER PRIMARY KEY,
   FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+''';
+
+  static const String _TimeSpentStatsTable = '''
+CREATE TABLE time_spent_stats (
+  date INTEGER PRIMARY KEY, -- milliseconds since epoch
+  time_spent_secs INTEGER NOT NULL DEFAULT 0
 )
 ''';
 

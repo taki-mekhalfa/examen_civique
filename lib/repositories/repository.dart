@@ -7,6 +7,10 @@ class Repository {
 
   Repository({required this.db});
 
+  int _dateToTimestamp(DateTime date) {
+    return DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+  }
+
   Future<List<SeriesProgress>> getSeriesProgressByType(int type) async {
     final seriesResult = await db.query(
       'series',
@@ -94,6 +98,19 @@ class Repository {
         topic: q['topic'] as String,
       );
     }).toList();
+  }
+
+  Future<void> updateTimeSpentStats(DateTime date, Duration timeSpent) async {
+    final timeSpentSecs = timeSpent.inSeconds;
+    final dateTs = _dateToTimestamp(date);
+    await db.rawUpdate(
+      '''
+      INSERT INTO time_spent_stats (date, time_spent_secs)
+      VALUES (?, ?)
+      ON CONFLICT(date) DO UPDATE SET time_spent_secs = time_spent_secs + ?
+      ''',
+      [dateTs, timeSpentSecs, timeSpentSecs],
+    );
   }
 }
 
