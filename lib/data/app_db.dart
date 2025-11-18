@@ -90,9 +90,12 @@ class AppDb {
     _questionsTable,
     _seriesQuestionsTable,
     _wrongQuestionsTable,
-    _TimeSpentStatsTable,
+    _timeSpentStatsTable,
+    _answersStatsTable,
+    _seriesStatsTable,
     _seriesQuestionsIndexOnSeriesId,
     _seriesQuestionsIndexOnQId,
+    _seriesStatsIndexOnDate,
   ];
 
   Future<void> _createSchema(Database db) async {
@@ -142,10 +145,31 @@ CREATE TABLE wrong_questions (
 )
 ''';
 
-  static const String _TimeSpentStatsTable = '''
+  static const String _timeSpentStatsTable = '''
 CREATE TABLE time_spent_stats (
-  date INTEGER PRIMARY KEY, -- milliseconds since epoch
+  date INTEGER PRIMARY KEY, -- milliseconds since epoch, truncated to the day
   time_spent_secs INTEGER NOT NULL DEFAULT 0
+)
+''';
+
+  static const String _answersStatsTable = '''
+CREATE TABLE answers_stats (
+  date INTEGER NOT NULL, -- milliseconds since epoch, truncated to the day
+  topic TEXT NOT NULL,
+  correct_count INTEGER NOT NULL DEFAULT 0,
+  incorrect_count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY(date, topic)
+)
+''';
+
+  static const String _seriesStatsTable = '''
+CREATE TABLE series_stats (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date INTEGER NOT NULL, -- milliseconds since epoch, truncated to the day
+  series_id INTEGER NOT NULL,
+  score REAL NOT NULL,
+  duration_secs INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY(series_id) REFERENCES series(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
 ''';
 
@@ -155,5 +179,9 @@ CREATE TABLE time_spent_stats (
 
   static const String _seriesQuestionsIndexOnQId = '''
   CREATE INDEX idx_series_questions_question_id ON series_questions(question_id)
+''';
+
+  static const String _seriesStatsIndexOnDate = '''
+  CREATE INDEX idx_series_stats_date ON series_stats(date)
 ''';
 }

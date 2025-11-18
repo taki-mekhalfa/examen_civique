@@ -4,7 +4,16 @@ import 'package:examen_civique/pages/simple_quiz_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-String formatDuration(Duration d) {
+String formatDuration(Duration d, {bool long = false}) {
+  if (long) {
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    final s = d.inSeconds.remainder(60);
+    if (h > 0) return '${h}h ${m}m ${s}s';
+    if (m > 0) return '${m}m ${s}s';
+    return '${s}s';
+  }
+
   final formatter = NumberFormat('00');
   final hours = d.inHours;
   final minutes = d.inMinutes.remainder(60);

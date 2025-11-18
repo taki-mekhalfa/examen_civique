@@ -6,7 +6,7 @@ import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/question.dart';
 import 'package:flutter/material.dart';
 
-enum ViewMode { corrections, thematiques }
+enum _ViewMode { corrections, thematiques }
 
 class ResultPage extends StatefulWidget {
   final Series series;
@@ -37,7 +37,7 @@ class _ResultPageState extends State<ResultPage> {
 
   // ===== State
   final Set<int> _expanded = <int>{};
-  ViewMode _mode = ViewMode.corrections;
+  _ViewMode _mode = _ViewMode.corrections;
 
   // ===== Derived
   double get _scorePct => widget.questions.isEmpty
@@ -75,15 +75,6 @@ class _ResultPageState extends State<ResultPage> {
         _expanded.add(index);
       }
     });
-  }
-
-  String _formatElapsed(Duration d) {
-    final h = d.inHours;
-    final m = d.inMinutes.remainder(60);
-    final s = d.inSeconds.remainder(60);
-    if (h > 0) return '${h}h ${m}m ${s}s';
-    if (m > 0) return '${m}m ${s}s';
-    return '${s}s';
   }
 
   @override
@@ -153,7 +144,7 @@ class _ResultPageState extends State<ResultPage> {
                               ),
                               const SizedBox(width: 6.0),
                               Text(
-                                'Temps écoulé : ${_formatElapsed(widget.duration)}',
+                                'Temps écoulé : ${formatDuration(widget.duration, long: true)}',
                                 style: AppTextStyles.medium14.copyWith(
                                   color: AppColors.primaryGrey,
                                 ),
@@ -170,7 +161,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                 ),
-                if (_mode == ViewMode.corrections)
+                if (_mode == _ViewMode.corrections)
                   ...List<Widget>.generate(widget.questions.length, (index) {
                     final isOpen = _expanded.contains(index);
                     return _QuestionResultTile(
@@ -357,8 +348,8 @@ class _StatusDot extends StatelessWidget {
 }
 
 class _ModeToggle extends StatefulWidget {
-  final ViewMode mode;
-  final ValueChanged<ViewMode> onChanged;
+  final _ViewMode mode;
+  final ValueChanged<_ViewMode> onChanged;
   const _ModeToggle({required this.mode, required this.onChanged});
   @override
   State<_ModeToggle> createState() => _ModeToggleState();
@@ -367,7 +358,7 @@ class _ModeToggle extends StatefulWidget {
 class _ModeToggleState extends State<_ModeToggle> {
   @override
   Widget build(BuildContext context) {
-    final bool isCorrections = widget.mode == ViewMode.corrections;
+    final bool isCorrections = widget.mode == _ViewMode.corrections;
 
     return Container(
       height: 40,
@@ -400,7 +391,7 @@ class _ModeToggleState extends State<_ModeToggle> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: () =>
-                      setState(() => widget.onChanged(ViewMode.corrections)),
+                      setState(() => widget.onChanged(_ViewMode.corrections)),
                   child: Center(
                     child: Text(
                       'Corrections',
@@ -417,7 +408,7 @@ class _ModeToggleState extends State<_ModeToggle> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: () =>
-                      setState(() => widget.onChanged(ViewMode.thematiques)),
+                      setState(() => widget.onChanged(_ViewMode.thematiques)),
                   child: Center(
                     child: Text(
                       'Thématiques',

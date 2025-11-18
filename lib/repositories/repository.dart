@@ -112,6 +112,45 @@ class Repository {
       [dateTs, timeSpentSecs, timeSpentSecs],
     );
   }
+
+  Future<void> updateAnswersStats(
+    DateTime date,
+    String topic,
+    bool isCorrect,
+  ) async {
+    final dateTs = _dateToTimestamp(date);
+    await db.rawUpdate(
+      '''
+    INSERT INTO answers_stats (date, topic, correct_count, incorrect_count)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(date, topic) DO UPDATE SET 
+      correct_count = correct_count + excluded.correct_count,
+      incorrect_count = incorrect_count + excluded.incorrect_count
+    ''',
+      [dateTs, topic, isCorrect ? 1 : 0, isCorrect ? 0 : 1],
+    );
+  }
+
+  Future<void> updateSeriesStats(
+    DateTime date,
+    int seriesId,
+    double score,
+    Duration duration,
+  ) async {
+    final durationSecs = duration.inSeconds;
+    final dateTs = _dateToTimestamp(date);
+    await db.rawUpdate(
+      '''
+      INSERT INTO series_stats (date, series_id, score, duration_secs)
+      VALUES (?, ?, ?, ?)
+      ''',
+      [dateTs, seriesId, score, durationSecs],
+    );
+  }
+
+  Future<WeekStatistics> getWeekStatistics(DateTime monday) async {
+    throw UnimplementedError();
+  }
 }
 
 class SeriesProgress {
@@ -138,4 +177,38 @@ class SeriesProgress {
       bestScore: (r['best_score'] as num?)?.toDouble(),
     );
   }
+}
+
+class TopicStatistics {
+  final String name;
+  final int correct;
+  final int total;
+  double get progress => total == 0 ? 0 : correct / total;
+  int get percentage => (progress * 100).round();
+  TopicStatistics({
+    required this.name,
+    required this.correct,
+    required this.total,
+  });
+}
+
+class WeekStatistics {
+  final DateTime monday;
+  final Duration timeSpent;
+  final Map<String, TopicStatistics> topics;
+  final List<double?> simpleSeries;
+  final List<double?> mockExams;
+
+  WeekStatistics({
+    required this.monday,
+    required this.timeSpent,
+    required this.topics,
+    required this.simpleSeries,
+    required this.mockExams,
+  });
+
+  int get answeredCount => topics.values.fold<int>(0, (s, v) => s + v.total);
+  int get correctCount => topics.values.fold<int>(0, (s, v) => s + v.correct);
+  double get correctPercentage =>
+      answeredCount == 0 ? 0.0 : correctCount / answeredCount;
 }

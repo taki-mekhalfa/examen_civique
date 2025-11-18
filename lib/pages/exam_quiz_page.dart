@@ -129,6 +129,15 @@ class _ExamQuizPageState extends State<ExamQuizPage>
     await Repository(db: db).addWrongQuestion(questionId);
   }
 
+  Future<void> _updateAnswersStats(
+    DateTime date,
+    String topic,
+    bool isCorrect,
+  ) async {
+    final db = await AppDb.instance.database;
+    await Repository(db: db).updateAnswersStats(date, topic, isCorrect);
+  }
+
   Future<void> _continueOrShake() async {
     if (_selectedAnswerIndex == null) {
       _shakeKey.currentState?.shake();
@@ -137,14 +146,21 @@ class _ExamQuizPageState extends State<ExamQuizPage>
 
     _selections[_currentQuestionIndex] = _selectedAnswerIndex!;
 
-    // Mark the question as wrong if it's incorrect
-    if (!widget.questions[_currentQuestionIndex].isCorrect(
+    final bool isCorrect = widget.questions[_currentQuestionIndex].isCorrect(
       _selectedAnswerIndex!,
-    )) {
-      try {
+    );
+
+    try {
+      if (!isCorrect) {
         await _addWrongQuestion(widget.questions[_currentQuestionIndex].id);
-      } catch (_) {}
-    }
+      }
+
+      await _updateAnswersStats(
+        DateTime.now(),
+        widget.questions[_currentQuestionIndex].topic,
+        isCorrect,
+      );
+    } catch (_) {}
 
     if (_isLastQuestion) {
       _navigateToResults();
@@ -160,6 +176,12 @@ class _ExamQuizPageState extends State<ExamQuizPage>
   Future<void> _saveProgress(double score) async {
     final db = await AppDb.instance.database;
     await Repository(db: db).updateSeriesProgress(widget.series.id, score);
+    await Repository(db: db).updateSeriesStats(
+      DateTime.now(),
+      widget.series.id,
+      score,
+      _stopwatch.elapsed,
+    );
   }
 
   Future<void> _navigateToResults() async {
@@ -177,8 +199,6 @@ class _ExamQuizPageState extends State<ExamQuizPage>
           DialogScreenLoader(),
     );
     final navigator = Navigator.of(context);
-
-    await _saveProgress(score);
 
     await retryForever(() => _saveProgress(score));
 

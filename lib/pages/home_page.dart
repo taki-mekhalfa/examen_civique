@@ -6,6 +6,7 @@ import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/errors_page.dart';
 import 'package:examen_civique/pages/exam_quiz_page.dart';
 import 'package:examen_civique/pages/simple_quiz_page.dart';
+import 'package:examen_civique/pages/statistics_page.dart';
 import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/count_down_widget.dart';
@@ -157,10 +158,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Widget _buildStatisticsTile(BuildContext context) {
-    return const HomeTile(
+    return HomeTile(
       title: 'Statistiques',
       imagePath: 'assets/images/statistiques.png',
-      // TODO: Add onTap handler
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => StatisticsPage()),
+      ),
     );
   }
 
@@ -419,13 +423,14 @@ class _SeriesInfo extends StatelessWidget {
   }
 }
 
-PreferredSizeWidget buildAppBar(String title) {
+PreferredSizeWidget buildAppBar(String title, {Widget? leading}) {
   return AppBar(
     elevation: 0.0,
     scrolledUnderElevation: 0,
     toolbarHeight: 50.0,
     title: Text(title, style: AppTextStyles.regular18),
     centerTitle: true,
+    leading: leading,
     actions: [
       IconButton(
         onPressed: () {
