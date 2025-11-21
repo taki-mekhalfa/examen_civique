@@ -148,8 +148,85 @@ class Repository {
     );
   }
 
-  Future<WeekStatistics> getWeekStatistics(DateTime monday) async {
-    throw UnimplementedError();
+  Future<Statistics> getStatistics(DateTime dayFrom, DateTime dayTo) async {
+    final fromMillis = dayFrom.millisecondsSinceEpoch;
+    final toMillis = dayTo.millisecondsSinceEpoch;
+
+    // 1. Parallelize Database Calls
+    final results = await Future.wait([
+      db.rawQuery(
+        'SELECT topic, SUM(correct_count) as correct_count, SUM(incorrect_count) as incorrect_count FROM answers_stats WHERE date BETWEEN ? AND ? GROUP BY topic',
+        [fromMillis, toMillis],
+      ),
+      db.rawQuery(
+        'SELECT COALESCE(SUM(time_spent_secs),0) as time_spent_secs FROM time_spent_stats WHERE date BETWEEN ? AND ?',
+        [fromMillis, toMillis],
+      ),
+      db.rawQuery(
+        'SELECT date, s.type, AVG(ss.score) as score FROM series s JOIN series_stats ss ON s.id = ss.series_id WHERE ss.date BETWEEN ? AND ? GROUP BY date, s.type',
+        [fromMillis, toMillis],
+      ),
+    ]);
+
+    final topicsResult = results[0];
+    final timeSpentResult = results[1];
+    final seriesResult = results[2];
+
+    // 2. Pre-process results into Maps for O(1) lookup
+    // Note: If multiple entries exist for the same date, this logic
+    // keeps the last one (matching your original logic).
+    final topicsMap = <String, TopicStatistics>{};
+    for (final t in topicsResult) {
+      final correct = t['correct_count'] as int;
+      final incorrect = t['incorrect_count'] as int;
+
+      topicsMap[t['topic'] as String] = TopicStatistics(
+        correct: correct,
+        total: correct + incorrect,
+      );
+    }
+
+    final simpleSeriesMap = <int, double>{};
+    final mockExamsMap = <int, double>{};
+
+    for (final s in seriesResult) {
+      final date = s['date'] as int;
+      final score = s['score'] as double;
+      final type = s['type'] as int;
+
+      if (type == SeriesType.simple.value) {
+        simpleSeriesMap[date] = score;
+      } else if (type == SeriesType.exam.value) {
+        mockExamsMap[date] = score;
+      }
+    }
+
+    final simpleSeriesList = <double?>[];
+    final mockExamsList = <double?>[];
+
+    // Iterate from start date to end date.
+    var currentDay = dayFrom;
+    while (!currentDay.isAfter(dayTo)) {
+      final currentMillis = currentDay.millisecondsSinceEpoch;
+      simpleSeriesList.add(simpleSeriesMap[currentMillis]);
+      mockExamsList.add(mockExamsMap[currentMillis]);
+
+      currentDay = currentDay.add(const Duration(days: 1));
+    }
+
+    // Safely extract time spent
+    final totalSeconds = timeSpentResult.isNotEmpty
+        ? (timeSpentResult.first['time_spent_secs'] as int? ?? 0)
+        : 0;
+
+    return Statistics(
+      from: dayFrom,
+      to: dayTo,
+      timeSpent: Duration(seconds: totalSeconds),
+      topics: topicsMap,
+      simpleSeries: simpleSeriesList,
+      mockExams: mockExamsList,
+    );
   }
 }
 
@@ -180,27 +257,29 @@ class SeriesProgress {
 }
 
 class TopicStatistics {
-  final String name;
   final int correct;
   final int total;
   double get progress => total == 0 ? 0 : correct / total;
   int get percentage => (progress * 100).round();
-  TopicStatistics({
-    required this.name,
-    required this.correct,
-    required this.total,
-  });
+  TopicStatistics({required this.correct, required this.total});
 }
 
-class WeekStatistics {
-  final DateTime monday;
-  final Duration timeSpent;
+class Statistics {
+  final DateTime from;
+  final DateTime to;
+
+  final Duration timeSpent; // sum of time spent learning on the app.
+
+  // these statistics are for each topic.
   final Map<String, TopicStatistics> topics;
+  // these statistics are for each day between from and to.
+  // null if no statistics for that day.
   final List<double?> simpleSeries;
   final List<double?> mockExams;
 
-  WeekStatistics({
-    required this.monday,
+  Statistics({
+    required this.from,
+    required this.to,
     required this.timeSpent,
     required this.topics,
     required this.simpleSeries,
@@ -212,3 +291,5 @@ class WeekStatistics {
   double get correctPercentage =>
       answeredCount == 0 ? 0.0 : correctCount / answeredCount;
 }
+
+

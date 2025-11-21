@@ -96,6 +96,7 @@ class AppDb {
     _seriesQuestionsIndexOnSeriesId,
     _seriesQuestionsIndexOnQId,
     _seriesStatsIndexOnDate,
+    _answersStatsIndexOnDate,
   ];
 
   Future<void> _createSchema(Database db) async {
@@ -183,5 +184,9 @@ CREATE TABLE series_stats (
 
   static const String _seriesStatsIndexOnDate = '''
   CREATE INDEX idx_series_stats_date ON series_stats(date)
+''';
+
+  static const String _answersStatsIndexOnDate = '''
+  CREATE INDEX idx_answers_stats_date ON answers_stats(date)
 ''';
 }

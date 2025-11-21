@@ -9,8 +9,8 @@ String formatDuration(Duration d, {bool long = false}) {
     final h = d.inHours;
     final m = d.inMinutes.remainder(60);
     final s = d.inSeconds.remainder(60);
-    if (h > 0) return '${h}h ${m}m ${s}s';
-    if (m > 0) return '${m}m ${s}s';
+    if (h > 0) return '${h}h ${m}m';
+    if (m > 0) return '${m}m';
     return '${s}s';
   }
 
@@ -26,7 +26,6 @@ String formatDuration(Duration d, {bool long = false}) {
 
 Color resultBarColor(double score) {
   if (score >= 0.8) return AppColors.correctGreen; // pass threshold
-  if (score >= 0.6) return AppColors.primaryNavyBlue;
   return AppColors.wrongRed;
 }
 
