@@ -737,7 +737,7 @@ class _WeekSeriesCardState extends State<_WeekSeriesCard> {
                           y: 32.0,
                           color: AppColors.correctGreen,
                           dashArray: [8, 5],
-                          strokeWidth: 0.5
+                          strokeWidth: 0.5,
                         ),
                       ],
                     ),
@@ -769,6 +769,8 @@ class _MonthSeriesCard extends StatelessWidget {
   const _MonthSeriesCard({required this.simpleSeries, required this.mockExams});
 
   List<FlSpot> _getSpots(List<double?> series) {
+    if (series.every((e) => e == null)) return [];
+
     return series.indexed.map((spot) {
       final (index, value) = spot;
       if (value == null) return FlSpot.nullSpot;
@@ -782,7 +784,7 @@ class _MonthSeriesCard extends StatelessWidget {
     final lastIndexMock = mockExams.lastIndexWhere((e) => e != null);
 
     if (lastIndexSimple == -1 && lastIndexMock == -1) {
-      return null;
+      return simpleSeries.length.toDouble();
     }
     return max(lastIndexSimple, lastIndexMock) + 1 + 0.1;
   }
