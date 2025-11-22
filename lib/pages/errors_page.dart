@@ -49,46 +49,59 @@ class ErrorsPage extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: _ContentCard(
-                      nbErrors: nbErrors,
-                      colorScheme: colorScheme,
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 24,
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: _ContentCard(
+                            nbErrors: nbErrors,
+                            colorScheme: colorScheme,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => {
+                            yesNoDialog(
+                              context: context,
+                              title:
+                                  'Souhaites-tu réinitialiser ton compteur ?',
+                              content:
+                                  'Ton compteur d\'erreurs sera remis à zéro.',
+                              onYesPressed: (context) =>
+                                  _handleResetCounter(context),
+                              onNoPressed: (context) => Navigator.pop(context),
+                            ),
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryNavyBlue,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
+                          ),
+                          child: Text(
+                            'Réinitialiser mon compteur',
+                            style: AppTextStyles.medium16.copyWith(
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => {
-                      yesNoDialog(
-                        context: context,
-                        title: 'Souhaites-tu réinitialiser ton compteur ?',
-                        content: 'Ton compteur d\'erreurs sera remis à zéro.',
-                        onYesPressed: (context) => _handleResetCounter(context),
-                        onNoPressed: (context) => Navigator.pop(context),
-                      ),
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryNavyBlue,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                    child: Text(
-                      'Réinitialiser mon compteur',
-                      style: AppTextStyles.medium16.copyWith(
-                        color: AppColors.white,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             );
           },
@@ -139,7 +152,7 @@ class _ContentCard extends StatelessWidget {
       surfaceTintColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+        padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
