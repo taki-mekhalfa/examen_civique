@@ -431,17 +431,6 @@ PreferredSizeWidget buildAppBar(String title, {Widget? leading}) {
     title: Text(title, style: AppTextStyles.regular18),
     centerTitle: true,
     leading: leading,
-    actions: [
-      IconButton(
-        onPressed: () {
-          // TODO: open a drawer or menu
-        },
-        icon: const Icon(Icons.menu),
-        color: AppColors.primaryGrey,
-        iconSize: 25,
-        tooltip: 'Menu',
-      ),
-    ],
     bottom: const PreferredSize(
       preferredSize: Size.fromHeight(2.0),
       child: DecoratedBox(
