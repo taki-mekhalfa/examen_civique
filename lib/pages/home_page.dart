@@ -3,6 +3,7 @@ import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
 import 'package:examen_civique/main.dart';
 import 'package:examen_civique/models/series.dart';
+import 'package:examen_civique/pages/about_exam_page.dart';
 import 'package:examen_civique/pages/errors_page.dart';
 import 'package:examen_civique/pages/exam_quiz_page.dart';
 import 'package:examen_civique/pages/simple_quiz_page.dart';
@@ -169,10 +170,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Widget _buildAboutTile(BuildContext context) {
-    return const HomeTile(
+    return HomeTile(
       title: "L'examen civique ?",
       imagePath: 'assets/images/a_propos.png',
-      // TODO: Add onTap handler
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AboutExamPage()),
+      ),
     );
   }
 
