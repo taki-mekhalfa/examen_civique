@@ -104,6 +104,54 @@ class AboutExamPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
+              // --- Section: Content Source ---
+              _SectionHeader(title: "Une préparation fiable"),
+              Card(
+                elevation: 1.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Tous nos ",
+                      style: AppTextStyles.regular14.copyWith(height: 1.5),
+                      children: [
+                        TextSpan(text: "QCM", style: AppTextStyles.bold14),
+                        const TextSpan(text: " et "),
+                        TextSpan(
+                          text: "questions de mise en situation",
+                          style: AppTextStyles.bold14,
+                        ),
+                        const TextSpan(text: " sont fondés sur le "),
+                        TextSpan(
+                          text: "Livret du citoyen",
+                          style: AppTextStyles.bold14.copyWith(
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        const TextSpan(text: ", les "),
+                        TextSpan(
+                          text: "réformes récentes",
+                          style: AppTextStyles.bold14,
+                        ),
+                        const TextSpan(text: " et les "),
+                        TextSpan(
+                          text: "retours d’expérience des candidats",
+                          style: AppTextStyles.bold14,
+                        ),
+                        const TextSpan(
+                          text:
+                              ", afin d’offrir une préparation complète et réaliste.",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
               // --- Section: The Programme (Detailed breakdown) ---
               _SectionHeader(title: "Le programme officiel"),
               GestureDetector(
