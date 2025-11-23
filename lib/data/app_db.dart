@@ -63,6 +63,7 @@ class AppDb {
           'answer': q['answer'],
           'explanation': q['explanation'],
           'topic': q['topic'],
+          'subtopic': q['subtopic'],
         }, conflictAlgorithm: ConflictAlgorithm.replace);
       }
 
@@ -125,7 +126,8 @@ class AppDb {
     choices TEXT NOT NULL,
     answer INTEGER NOT NULL,
     explanation TEXT NOT NULL,
-    topic TEXT NOT NULL
+    topic TEXT NOT NULL,
+    subtopic TEXT NOT NULL
   )
 ''';
 

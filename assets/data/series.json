@@ -11,7 +11,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** La devise *« Liberté, Égalité, Fraternité »* figure à l’article 2 de la Constitution et exprime les valeurs fondamentales de la République française.",
-            "topic": "Principes et valeurs"
+            "topic": "Principes et valeurs",
+            "subtopic": "Devise et symboles de la République"
         },
         {
             "id": 2,
@@ -24,7 +25,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** *La Marianne* est le symbole de la République française. Elle incarne la **liberté**, la **raison** et la **démocratie**.",
-            "topic": "Principes et valeurs"
+            "topic": "Principes et valeurs",
+            "subtopic": "Devise et symboles de la République"
         },
         {
             "id": 3,
@@ -37,7 +39,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** *« La Marseillaise »* est l’hymne national français, composé en **1792** par **Rouget de Lisle**.",
-            "topic": "Principes et valeurs"
+            "topic": "Principes et valeurs",
+            "subtopic": "Devise et symboles de la République"
         },
         {
             "id": 4,
@@ -50,7 +53,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** La **laïcité** garantit la *liberté de conscience* et la **neutralité de l’État** vis-à-vis des religions.",
-            "topic": "Principes et valeurs"
+            "topic": "Principes et valeurs",
+            "subtopic": "Laïcité"
         },
         {
             "id": 5,
@@ -63,7 +67,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** Selon l’article 8 de la **Constitution**, le **Président de la République** nomme le Premier ministre.",
-            "topic": "Institutions et politique"
+            "topic": "Institutions et politique",
+            "subtopic": "Organisation de la République française"
         },
         {
             "id": 6,
@@ -76,7 +81,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** Depuis la **réforme de 2000**, le mandat présidentiel en France est de **5 ans** (*quinquennat*).",
-            "topic": "Institutions et politique"
+            "topic": "Institutions et politique",
+            "subtopic": "Organisation de la République française"
         },
         {
             "id": 7,
@@ -89,7 +95,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** Le **Parlement**, composé de l’**Assemblée nationale** et du **Sénat**, est chargé de voter les lois.",
-            "topic": "Institutions et politique"
+            "topic": "Institutions et politique",
+            "subtopic": "Organisation de la République française"
         },
         {
             "id": 8,
@@ -102,7 +109,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** Le **Conseil constitutionnel** veille à la conformité des lois avec la **Constitution**.",
-            "topic": "Institutions et politique"
+            "topic": "Institutions et politique",
+            "subtopic": "Organisation de la République française"
         },
         {
             "id": 9,
@@ -115,7 +123,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** Tout résident doit **respecter les lois de la République**, fondement du vivre-ensemble.",
-            "topic": "Droits et devoirs"
+            "topic": "Droits et devoirs",
+            "subtopic": "Obligations et devoirs des personnes résidant en France"
         },
         {
             "id": 10,
@@ -128,7 +137,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** Le **droit à la propriété privée** est un droit fondamental reconnu par la **Déclaration des droits de l’homme et du citoyen de 1789**.",
-            "topic": "Droits et devoirs"
+            "topic": "Droits et devoirs",
+            "subtopic": "Droits fondamentaux"
         },
         {
             "id": 11,
@@ -141,7 +151,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** Le **droit de vote** est accordé à tout citoyen français âgé d’au moins **18 ans**.",
-            "topic": "Droits et devoirs"
+            "topic": "Droits et devoirs",
+            "subtopic": "Droits fondamentaux"
         },
         {
             "id": 12,
@@ -154,7 +165,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** **Voter** est un devoir civique fondamental pour participer à la **vie démocratique**.",
-            "topic": "Droits et devoirs"
+            "topic": "Droits et devoirs",
+            "subtopic": "Obligations et devoirs des personnes résidant en France"
         },
         {
             "id": 13,
@@ -167,7 +179,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** La **Révolution française de 1789** met fin à la **monarchie absolue** et marque la naissance de la **République**.",
-            "topic": "Histoire et culture"
+            "topic": "Histoire et culture",
+            "subtopic": "Principales périodes et personnages historiques"
         },
         {
             "id": 14,
@@ -180,7 +193,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** **Charles de Gaulle** devient le premier président de la **Ve République** en **1959**.",
-            "topic": "Histoire et culture"
+            "topic": "Histoire et culture",
+            "subtopic": "Principales périodes et personnages historiques"
         },
         {
             "id": 15,
@@ -193,7 +207,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** Le **14 juillet** commémore la **prise de la Bastille (1789)**, symbole de la liberté.",
-            "topic": "Histoire et culture"
+            "topic": "Histoire et culture",
+            "subtopic": "Principales périodes et personnages historiques"
         },
         {
             "id": 16,
@@ -206,7 +221,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** **Victor Hugo**, écrivain engagé, est l’auteur de *« Les Misérables »*, œuvre majeure du **XIXe siècle**.",
-            "topic": "Histoire et culture"
+            "topic": "Histoire et culture",
+            "subtopic": "Patrimoine français"
         },
         {
             "id": 17,
@@ -219,7 +235,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** Une **carte de séjour autorisant le travail** prouve le droit de résider et d’exercer une activité professionnelle en France.",
-            "topic": "Société et vie"
+            "topic": "Société et vie",
+            "subtopic": "Travailler en France"
         },
         {
             "id": 18,
@@ -232,7 +249,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** L’**école** a pour mission d’assurer **l’instruction**, **l’éducation civique** et **l’égalité des chances** pour tous.",
-            "topic": "Société et vie"
+            "topic": "Société et vie",
+            "subtopic": "Autorité parentale et système éducatif"
         },
         {
             "id": 19,
@@ -245,7 +263,8 @@
             ],
             "answer": 0,
             "explanation": "**Explication :** La **Sécurité sociale** garantit l’accès aux soins et la **protection sanitaire** de tous.",
-            "topic": "Société et vie"
+            "topic": "Société et vie",
+            "subtopic": "L’accès aux soins"
         },
         {
             "id": 20,
@@ -258,7 +277,8 @@
             ],
             "answer": 1,
             "explanation": "**Explication :** La **protection sociale** vise à garantir un **revenu en cas de maladie, chômage, vieillesse ou maternité**.",
-            "topic": "Société et vie"
+            "topic": "Société et vie",
+            "subtopic": "L’accès aux soins"
         }
     ],
     "series": [

@@ -198,27 +198,48 @@ class AboutExamPage extends StatelessWidget {
               _ThemeCard(
                 title: "Principes et valeurs",
                 count: 11,
-                desc: "Devise, symboles, laïcité, etc.",
+                subtopics: const [
+                  "Devise et symboles de la République : 3 questions",
+                  "Laïcité : 2 questions",
+                  "Mises en situation : 6 questions",
+                ],
+              ),
+              _ThemeCard(
+                title: "Institutions et politique",
+                count: 6,
+                subtopics: const [
+                  "Démocratie et droit de vote : 3 questions",
+                  "Organisation de la République française : 2 questions",
+                  "Institutions européennes : 1 question",
+                ],
               ),
               _ThemeCard(
                 title: "Droits et devoirs",
                 count: 11,
-                desc: "Droits fondamentaux, impôts, lois, etc.",
+                subtopics: const [
+                  "Droits fondamentaux : 2 questions",
+                  "Obligations et devoirs des personnes résidant en France : 3 questions",
+                  "Mises en situation : 6 questions",
+                ],
               ),
               _ThemeCard(
-                title: "Histoire & Culture",
+                title: "Histoire et culture",
                 count: 8,
-                desc: "Grands personnages, géographie, patrimoine, etc.",
-              ),
-              _ThemeCard(
-                title: "Institutions et Politique",
-                count: 6,
-                desc: "Démocratie, vote, Union Européenne, etc.",
+                subtopics: const [
+                  "Principales périodes et personnages historiques : 3 questions",
+                  "Territoires et géographie : 3 questions",
+                  "Patrimoine français : 2 questions",
+                ],
               ),
               _ThemeCard(
                 title: "Société et vie",
                 count: 4,
-                desc: "Santé, travail, école, logement, etc.",
+                subtopics: const [
+                  "S’installer et résider en France : 1 question",
+                  "L’accès aux soins : 1 question",
+                  "Travailler en France : 1 question",
+                  "Autorité parentale et système éducatif : 1 question",
+                ],
               ),
 
               const SizedBox(height: 24),
@@ -380,12 +401,12 @@ class _CheckRow extends StatelessWidget {
 class _ThemeCard extends StatelessWidget {
   final String title;
   final int count;
-  final String desc;
+  final List<String> subtopics;
 
   const _ThemeCard({
     required this.title,
     required this.count,
-    required this.desc,
+    required this.subtopics,
   });
 
   @override
@@ -396,55 +417,77 @@ class _ThemeCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppColors.primaryNavyBlue,
-                borderRadius: BorderRadius.circular(2),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                width: 4,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryNavyBlue,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(title, style: AppTextStyles.bold14),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(title, style: AppTextStyles.bold14),
                         ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGreyLight,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.superSilver),
-                        ),
-                        child: Text(
-                          "$count questions",
-                          style: AppTextStyles.bold14.copyWith(
-                            color: AppColors.primaryGrey,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGreyLight,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.superSilver),
+                          ),
+                          child: Text(
+                            "$count questions",
+                            style: AppTextStyles.bold14.copyWith(
+                              color: AppColors.primaryGrey,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    desc,
-                    style: AppTextStyles.regular12.copyWith(
-                      color: AppColors.grey425,
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    ...subtopics.map(
+                      (subtopic) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "• ",
+                              style: TextStyle(color: AppColors.grey425),
+                            ),
+                            Expanded(
+                              child: Text(
+                                subtopic,
+                                style: AppTextStyles.regular12.copyWith(
+                                  color: AppColors.grey425,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

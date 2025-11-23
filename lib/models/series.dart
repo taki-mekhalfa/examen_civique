@@ -26,6 +26,7 @@ class Question {
   final int answer;
   final String explanation;
   final String topic;
+  final String subtopic;
 
   Question({
     required this.id,
@@ -34,6 +35,7 @@ class Question {
     required this.answer,
     required this.explanation,
     required this.topic,
+    required this.subtopic,
   });
 
   bool isCorrect(int selectedAnswer) {

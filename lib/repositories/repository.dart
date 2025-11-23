@@ -55,6 +55,7 @@ class Repository {
         answer: q['answer'] as int,
         explanation: q['explanation'] as String,
         topic: q['topic'] as String,
+        subtopic: q['subtopic'] as String,
       );
     }).toList();
   }
@@ -96,6 +97,7 @@ class Repository {
         answer: q['answer'] as int,
         explanation: q['explanation'] as String,
         topic: q['topic'] as String,
+        subtopic: q['subtopic'] as String,
       );
     }).toList();
   }
@@ -291,5 +293,3 @@ class Statistics {
   double get correctPercentage =>
       answeredCount == 0 ? 0.0 : correctCount / answeredCount;
 }
-
-

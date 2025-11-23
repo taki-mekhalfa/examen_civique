@@ -99,6 +99,26 @@ class QuestionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5.0),
+              DecoratedBox(
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryNavyBlue,
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
+                  child: Text(
+                    question.subtopic,
+                    style: AppTextStyles.regular13.copyWith(
+                      color: Colors.white,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5.0),
               // Question
               Text(
                 question.text,
