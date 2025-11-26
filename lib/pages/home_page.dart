@@ -6,6 +6,7 @@ import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/about_exam_page.dart';
 import 'package:examen_civique/pages/errors_page.dart';
 import 'package:examen_civique/pages/exam_quiz_page.dart';
+import 'package:examen_civique/pages/legal_notice_page.dart';
 import 'package:examen_civique/pages/simple_quiz_page.dart';
 import 'package:examen_civique/pages/statistics_page.dart';
 import 'package:examen_civique/repositories/repository.dart';
@@ -75,6 +76,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             _buildErrorsTile(context),
             _buildStatisticsTile(context),
             _buildAboutTile(context),
+            const SizedBox(height: 20),
+            _buildLegalNoticeLink(context),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -176,6 +180,24 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const AboutExamPage()),
+      ),
+    );
+  }
+
+  Widget _buildLegalNoticeLink(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LegalNoticePage()),
+        ),
+        child: Text(
+          "Conditions d'utilisation",
+          style: AppTextStyles.regular12.copyWith(
+            color: AppColors.grey425,
+            decoration: TextDecoration.underline,
+          ),
+        ),
       ),
     );
   }
