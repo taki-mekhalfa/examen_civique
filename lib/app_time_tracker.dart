@@ -55,6 +55,7 @@ class AppTimeTracker with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
     switch (state) {
       case AppLifecycleState.resumed:
         _startTimer();
@@ -63,10 +64,9 @@ class AppTimeTracker with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
         _flush(resetStartTime: false);
         _timer?.cancel();
-        break;
-      default:
         break;
     }
   }
