@@ -13,7 +13,7 @@ class AppTimeTracker with WidgetsBindingObserver {
   static const _interval = Duration(minutes: 1);
 
   late DateTime _startTime;
-  Timer? _timer;
+  late Timer _timer;
 
   void init() {
     WidgetsBinding.instance.addObserver(this);
@@ -22,17 +22,17 @@ class AppTimeTracker with WidgetsBindingObserver {
 
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _timer?.cancel();
+    _timer.cancel();
   }
 
   void _startTimer() {
-    if (_timer != null && _timer!.isActive) return;
-
     _startTime = DateTime.now();
-    _timer = Timer.periodic(_interval, (_) => _flush(resetStartTime: true));
+    _timer = Timer.periodic(_interval, (_) => _flush());
   }
 
-  Future<void> _flush({required bool resetStartTime}) async {
+  Future<void> _flush() async {
+    if (!_timer.isActive) return;
+
     final now = DateTime.now();
     if (now.isBefore(_startTime)) {
       _startTime = now;
@@ -40,10 +40,7 @@ class AppTimeTracker with WidgetsBindingObserver {
     }
 
     final elapsed = now.difference(_startTime);
-
-    if (resetStartTime) {
-      _startTime = now;
-    }
+    _startTime = now;
 
     try {
       final db = await AppDb.instance.database;
@@ -55,7 +52,6 @@ class AppTimeTracker with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print(state);
     switch (state) {
       case AppLifecycleState.resumed:
         _startTimer();
@@ -65,8 +61,8 @@ class AppTimeTracker with WidgetsBindingObserver {
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        _flush(resetStartTime: false);
-        _timer?.cancel();
+        _flush();
+        _timer.cancel();
         break;
     }
   }
