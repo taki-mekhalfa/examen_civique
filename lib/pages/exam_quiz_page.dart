@@ -103,7 +103,7 @@ class _ExamQuizPageState extends State<ExamQuizPage>
       SnackBar(
         content: Center(
           child: Text(
-            'Temps écoulé !',
+            'Temps écoulé\u00A0!',
             style: AppTextStyles.medium16.copyWith(color: AppColors.white),
             textAlign: TextAlign.center,
           ),
@@ -245,7 +245,7 @@ class _ExamQuizPageState extends State<ExamQuizPage>
           ],
           onClosePressed: () => yesNoDialog(
             context: context,
-            title: 'Souhaites-tu vraiment quitter ?',
+            title: 'Souhaites-tu vraiment quitter\u00A0?',
             content: 'Si tu quittes maintenant, ton progrès sera perdu.',
             onYesPressed: (context) => {
               Navigator.pop(context), // close dialog

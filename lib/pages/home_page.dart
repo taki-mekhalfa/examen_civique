@@ -175,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Widget _buildAboutTile(BuildContext context) {
     return HomeTile(
-      title: "L'examen civique ?",
+      title: "L'examen civique\u00A0?",
       imagePath: 'assets/images/a_propos.png',
       onTap: () => Navigator.push(
         context,
@@ -503,7 +503,7 @@ void _showNoErrorsDialog(BuildContext context) {
     builder: (context) => AlertDialog(
       title: Center(
         child: Text(
-          "Pas d'erreurs !",
+          "Pas d'erreurs\u00A0!",
           style: AppTextStyles.medium20,
           textAlign: TextAlign.center,
         ),
@@ -521,7 +521,7 @@ void _showNoErrorsDialog(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Tu n'as pas fait d'erreur... Bravo !",
+              "Tu n'as pas fait d'erreur... Bravo\u00A0!",
               style: AppTextStyles.regular14,
               textAlign: TextAlign.center,
             ),

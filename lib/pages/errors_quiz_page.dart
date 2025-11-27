@@ -92,10 +92,12 @@ class _ErrorsQuizState extends State<ErrorsQuiz> {
       canPop: false,
       child: Scaffold(
         appBar: QuizAppBar(
-          title: 'Erreurs restantes: ${widget.questions.length}',
+          title: widget.questions.length == 1
+              ? 'Erreur restante'
+              : 'Erreurs restantes\u00A0: ${widget.questions.length}',
           onClosePressed: () => yesNoDialog(
             context: context,
-            title: 'Souhaites-tu vraiment quitter ?',
+            title: 'Souhaites-tu vraiment quitter\u00A0?',
             onYesPressed: (context) => {
               Navigator.pop(context), // close dialog
               Navigator.pop(context), // exit quiz

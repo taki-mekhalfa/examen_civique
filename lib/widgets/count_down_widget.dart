@@ -21,7 +21,7 @@ class _CountdownScreenState extends State<CountdownScreen>
 
   final List<Widget> _texts = [
     Text(
-      "C'est parti !",
+      "C'est parti\u00A0!",
       style: AppTextStyles.medium16.copyWith(
         color: AppColors.white,
         fontSize: 30,

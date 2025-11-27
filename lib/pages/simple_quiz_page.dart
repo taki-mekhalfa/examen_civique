@@ -203,7 +203,7 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
           ],
           onClosePressed: () => yesNoDialog(
             context: context,
-            title: 'Souhaites-tu vraiment quitter ?',
+            title: 'Souhaites-tu vraiment quitter\u00A0?',
             content: 'Si tu quittes maintenant, ton progrès sera perdu.',
             onYesPressed: (context) => {
               Navigator.pop(context), // close dialog

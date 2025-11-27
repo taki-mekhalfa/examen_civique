@@ -144,7 +144,7 @@ class _ResultPageState extends State<ResultPage> {
                               ),
                               const SizedBox(width: 6.0),
                               Text(
-                                'Temps écoulé : ${formatDuration(widget.duration, long: true)}',
+                                'Temps écoulé\u00A0: ${formatDuration(widget.duration, long: true)}',
                                 style: AppTextStyles.medium14.copyWith(
                                   color: AppColors.primaryGrey,
                                 ),

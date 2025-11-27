@@ -13,7 +13,7 @@ class AboutExamPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.primaryGreyLight,
       appBar: buildAppBar(
-        "L'examen civique ?",
+        "L'examen civique\u00A0?",
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close),
@@ -83,7 +83,7 @@ class AboutExamPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // --- Section: Who is it for? ---
-              _SectionHeader(title: "Qui est concerné ?"),
+              _SectionHeader(title: "Qui est concerné\u00A0?"),
               Card(
                 elevation: 1.0,
                 shape: RoundedRectangleBorder(
@@ -189,7 +189,7 @@ class AboutExamPage extends StatelessWidget {
                         color: AppColors.primaryGrey,
                       ),
                     ),
-                    const TextSpan(text: " thématiques précises :"),
+                    const TextSpan(text: " thématiques précises\u00A0:"),
                   ],
                 ),
               ),
@@ -199,46 +199,46 @@ class AboutExamPage extends StatelessWidget {
                 title: "Principes et valeurs",
                 count: 11,
                 subtopics: const [
-                  "Devise et symboles de la République : 3 questions",
-                  "Laïcité : 2 questions",
-                  "Mises en situation : 6 questions",
+                  "Devise et symboles de la République\u00A0: 3 questions",
+                  "Laïcité\u00A0: 2 questions",
+                  "Mises en situation\u00A0: 6 questions",
                 ],
               ),
               _ThemeCard(
                 title: "Institutions et politique",
                 count: 6,
                 subtopics: const [
-                  "Démocratie et droit de vote : 3 questions",
-                  "Organisation de la République française : 2 questions",
-                  "Institutions européennes : 1 question",
+                  "Démocratie et droit de vote\u00A0: 3 questions",
+                  "Organisation de la République française\u00A0: 2 questions",
+                  "Institutions européennes\u00A0: 1 question",
                 ],
               ),
               _ThemeCard(
                 title: "Droits et devoirs",
                 count: 11,
                 subtopics: const [
-                  "Droits fondamentaux : 2 questions",
-                  "Obligations et devoirs des personnes résidant en France : 3 questions",
-                  "Mises en situation : 6 questions",
+                  "Droits fondamentaux\u00A0: 2 questions",
+                  "Obligations et devoirs des personnes résidant en France\u00A0: 3 questions",
+                  "Mises en situation\u00A0: 6 questions",
                 ],
               ),
               _ThemeCard(
                 title: "Histoire et culture",
                 count: 8,
                 subtopics: const [
-                  "Principales périodes et personnages historiques : 3 questions",
-                  "Territoires et géographie : 3 questions",
-                  "Patrimoine français : 2 questions",
+                  "Principales périodes et personnages historiques\u00A0: 3 questions",
+                  "Territoires et géographie\u00A0: 3 questions",
+                  "Patrimoine français\u00A0: 2 questions",
                 ],
               ),
               _ThemeCard(
                 title: "Société et vie",
                 count: 4,
                 subtopics: const [
-                  "S’installer et résider en France : 1 question",
-                  "L’accès aux soins : 1 question",
-                  "Travailler en France : 1 question",
-                  "Autorité parentale et système éducatif : 1 question",
+                  "S’installer et résider en France\u00A0: 1 question",
+                  "L’accès aux soins\u00A0: 1 question",
+                  "Travailler en France\u00A0: 1 question",
+                  "Autorité parentale et système éducatif\u00A0: 1 question",
                 ],
               ),
 

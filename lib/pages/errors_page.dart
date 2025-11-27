@@ -72,7 +72,7 @@ class ErrorsPage extends StatelessWidget {
                             yesNoDialog(
                               context: context,
                               title:
-                                  'Souhaites-tu réinitialiser ton compteur ?',
+                                  'Souhaites-tu réinitialiser ton compteur\u00A0?',
                               content:
                                   'Ton compteur d\'erreurs sera remis à zéro.',
                               onYesPressed: (context) =>
@@ -180,7 +180,7 @@ class _ContentCard extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: 'À corriger: ',
+                        text: 'À corriger\u00A0: ',
                         style: AppTextStyles.regular16,
                       ),
                       TextSpan(
@@ -194,7 +194,7 @@ class _ContentCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Prêt·e à relever le défi ?',
+                  'Prêt·e à relever le défi\u00A0?',
                   style: AppTextStyles.regular16,
                   textAlign: TextAlign.center,
                 ),
@@ -245,14 +245,14 @@ class NoMoreErrorsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 32.0),
                   Text(
-                    'Félicitations !',
+                    'Félicitations\u00A0!',
                     style: AppTextStyles.medium30.copyWith(
                       color: AppColors.primaryNavyBlue,
                     ),
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    'Tu as corrigé toutes les erreurs !',
+                    'Tu as corrigé toutes les erreurs\u00A0!',
                     style: AppTextStyles.regular16,
                   ),
                 ],
