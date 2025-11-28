@@ -64,7 +64,7 @@ class InitScreen extends StatelessWidget {
       // Initialize the database
       await Future.wait([
         AppDb().database,
-        Future.delayed(const Duration(seconds: 1)),
+        Future.delayed(const Duration(milliseconds: 500)),
       ]);
     } catch (e) {
       developer.log('Error initializing app: $e');

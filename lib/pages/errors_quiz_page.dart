@@ -93,7 +93,7 @@ class _ErrorsQuizState extends State<ErrorsQuiz> {
       child: Scaffold(
         appBar: QuizAppBar(
           title: widget.questions.length == 1
-              ? 'Erreur restante'
+              ? 'Erreur restante\u00A0: ${widget.questions.length}'
               : 'Erreurs restantes\u00A0: ${widget.questions.length}',
           onClosePressed: () => yesNoDialog(
             context: context,

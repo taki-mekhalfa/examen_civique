@@ -74,11 +74,14 @@ class AppDb {
           'position': s['position'],
         }, conflictAlgorithm: ConflictAlgorithm.replace);
 
+        int questionPosition = 1;
         for (final qId in s['questionIds'] as List) {
           batch.insert('series_questions', {
             'series_id': s['id'],
             'question_id': qId,
+            'question_position': questionPosition,
           }, conflictAlgorithm: ConflictAlgorithm.replace);
+          questionPosition++;
         }
       }
 
@@ -135,6 +138,7 @@ class AppDb {
   CREATE TABLE series_questions (
     series_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
+    question_position INTEGER NOT NULL,
     PRIMARY KEY(series_id, question_id),
     FOREIGN KEY(series_id) REFERENCES series(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE ON UPDATE CASCADE

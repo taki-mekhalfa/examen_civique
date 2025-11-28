@@ -11,6 +11,7 @@ import 'package:examen_civique/pages/simple_quiz_page.dart';
 import 'package:examen_civique/pages/statistics_page.dart';
 import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
+import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/count_down_widget.dart';
 import 'package:examen_civique/widgets/errors_badge.dart';
 import 'package:examen_civique/widgets/home_tile_widget.dart';
@@ -279,9 +280,11 @@ class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const DialogScreenLoader();
             }
-            return SeriesList(
-              seriesProgress: snapshot.data!,
-              type: widget.type,
+            return Stack(
+              children: [
+                SeriesList(seriesProgress: snapshot.data!, type: widget.type),
+                const BottomFade(),
+              ],
             );
           },
         ),

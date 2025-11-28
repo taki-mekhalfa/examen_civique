@@ -42,7 +42,7 @@ class Repository {
       FROM questions q
       INNER JOIN series_questions sq ON q.id = sq.question_id
       WHERE sq.series_id = ?
-      ORDER BY sq.question_id
+      ORDER BY sq.question_position
       ''',
       [seriesId],
     );
