@@ -56,31 +56,53 @@ class AppDb {
       final batch = txn.batch();
 
       for (final q in questions) {
-        batch.insert('questions', {
-          'id': q['id'],
-          'text': q['text'],
-          'choices': jsonEncode(List<String>.from(q['choices'] as List)),
-          'answer': q['answer'],
-          'explanation': q['explanation'],
-          'topic': q['topic'],
-          'subtopic': q['subtopic'],
-        }, conflictAlgorithm: ConflictAlgorithm.replace);
+        batch.rawInsert(
+          '''
+          INSERT INTO questions (id, text, choices, answer, explanation, topic, subtopic)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            text = excluded.text,
+            choices = excluded.choices,
+            answer = excluded.answer,
+            explanation = excluded.explanation,
+            topic = excluded.topic,
+            subtopic = excluded.subtopic
+          ''',
+          [
+            q['id'],
+            q['text'],
+            jsonEncode(List<String>.from(q['choices'] as List)),
+            q['answer'],
+            q['explanation'],
+            q['topic'],
+            q['subtopic'],
+          ],
+        );
       }
 
       for (final s in series) {
-        batch.insert('series', {
-          'id': s['id'],
-          'type': s['type'],
-          'position': s['position'],
-        }, conflictAlgorithm: ConflictAlgorithm.replace);
+        batch.rawInsert(
+          '''
+          INSERT INTO series (id, type, position)
+          VALUES (?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            type = excluded.type,
+            position = excluded.position
+          ''',
+          [s['id'], s['type'], s['position']],
+        );
 
         int questionPosition = 1;
         for (final qId in s['questionIds'] as List) {
-          batch.insert('series_questions', {
-            'series_id': s['id'],
-            'question_id': qId,
-            'question_position': questionPosition,
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
+          batch.rawInsert(
+            '''
+            INSERT INTO series_questions (series_id, question_id, question_position)
+            VALUES (?, ?, ?)
+            ON CONFLICT(series_id, question_id) DO UPDATE SET
+              question_position = excluded.question_position
+            ''',
+            [s['id'], qId, questionPosition],
+          );
           questionPosition++;
         }
       }
