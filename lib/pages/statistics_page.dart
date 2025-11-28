@@ -728,6 +728,11 @@ class _WeekSeriesCardState extends State<_WeekSeriesCard> {
                           y2: 40.0,
                           color: AppColors.softGreen,
                         ),
+                        HorizontalRangeAnnotation(
+                          y1: 24.0,
+                          y2: 32.0,
+                          color: AppColors.softOrange,
+                        ),
                       ],
                     ),
                     extraLinesData: ExtraLinesData(
@@ -736,6 +741,12 @@ class _WeekSeriesCardState extends State<_WeekSeriesCard> {
                         HorizontalLine(
                           y: 32.0,
                           color: AppColors.correctGreen,
+                          dashArray: [8, 5],
+                          strokeWidth: 0.5,
+                        ),
+                        HorizontalLine(
+                          y: 24.0,
+                          color: AppColors.orange,
                           dashArray: [8, 5],
                           strokeWidth: 0.5,
                         ),
@@ -899,6 +910,11 @@ class _MonthSeriesCard extends StatelessWidget {
                           y2: 40.0,
                           color: AppColors.softGreen,
                         ),
+                        HorizontalRangeAnnotation(
+                          y1: 24.0,
+                          y2: 32.0,
+                          color: AppColors.softOrange,
+                        ),
                       ],
                     ),
                     extraLinesData: ExtraLinesData(
@@ -909,6 +925,12 @@ class _MonthSeriesCard extends StatelessWidget {
                           dashArray: [8, 5],
                           strokeWidth: 0.5,
                           color: AppColors.correctGreen,
+                        ),
+                        HorizontalLine(
+                          y: 24.0,
+                          dashArray: [8, 5],
+                          strokeWidth: 0.5,
+                          color: AppColors.orange,
                         ),
                       ],
                     ),

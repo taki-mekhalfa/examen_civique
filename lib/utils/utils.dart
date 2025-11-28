@@ -26,6 +26,7 @@ String formatDuration(Duration d, {bool long = false}) {
 
 Color resultBarColor(double score) {
   if (score >= 0.8) return AppColors.correctGreen; // pass threshold
+  if (score >= 0.6) return AppColors.orange;
   return AppColors.wrongRed;
 }
 

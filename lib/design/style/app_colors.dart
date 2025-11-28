@@ -55,6 +55,8 @@ class AppColors {
   static const Color wrongRed = Color(0xFFCC3047);
   static const Color softGreen = Color(0xFFE8F5EC);
   static const Color softRed = Color(0xFFFDEBEC);
+  static const Color orange = Color(0xFFFFA500);
+  static const Color softOrange = Color(0xFFFCE7CF);
 
   // couleur de badge
   static const Color badgeDepartemental = Color(0xFFFEE7FC);
