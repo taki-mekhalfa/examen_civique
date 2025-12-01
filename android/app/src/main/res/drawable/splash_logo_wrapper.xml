@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 
+         We explicitly set width/height to 72dp.
+         The Android 12 splash window is 108dp, but the "safe" circle is smaller.
+         72dp ensures it fits safely in the center without being cropped.
+         
+         Since your source image is in 'drawable-xxxhdpi', Android will take 
+         that high-res image and scale it down nicely to 72dp.
+    -->
+    <item
+        android:width="108dp"
+        android:height="108dp"
+        android:drawable="@drawable/splash_logo"
+        android:gravity="center" />
+</layer-list>

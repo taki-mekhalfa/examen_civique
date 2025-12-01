@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:examen_civique/app_time_tracker.dart';
 import 'package:examen_civique/data/app_db.dart';
+import 'package:examen_civique/noti_service.dart';
 import 'package:examen_civique/pages/home_page.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/utils/utils.dart';
@@ -16,6 +17,11 @@ final RouteObserver<ModalRoute<void>> routeObserver =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final notifService = NotiService();
+  await notifService.initNotification();
+  await notifService.scheduleSaturdayTenAM();
+
   Intl.defaultLocale = 'fr_FR';
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -29,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mon Examen Civique',
+      title: 'Mon Examen Civiqu5e',
       locale: const Locale('fr', 'FR'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
