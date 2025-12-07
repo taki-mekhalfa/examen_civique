@@ -16,9 +16,17 @@ import 'package:flutter/material.dart';
 class SimpleQuizPage extends StatefulWidget {
   final Series series;
   final List<Question> questions;
+  final int initialIndex;
+  final List<int> initialAnswers;
+  final int initialTimeSpent;
 
-  SimpleQuizPage({super.key, required this.series})
-    : questions = series.questions;
+  SimpleQuizPage({
+    super.key,
+    required this.series,
+    this.initialIndex = 0,
+    this.initialAnswers = const [],
+    this.initialTimeSpent = 0,
+  }) : questions = series.questions;
 
   @override
   State<SimpleQuizPage> createState() => _SimpleQuizPageState();
@@ -48,8 +56,23 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
   }
 
   void _initializeQuiz() {
+    _currentQuestionIndex = widget.initialIndex;
     _selections = List<int>.filled(widget.questions.length, -1);
-    _stopwatch = Stopwatch()..start();
+    for (int i = 0; i < widget.initialAnswers.length; i++) {
+      if (i < _selections.length) {
+        _selections[i] = widget.initialAnswers[i];
+      }
+    }
+
+    _stopwatch = Stopwatch();
+    // We can't set elapsed on stopwatch directly, but we can account for it
+    // by adding it when saving/displaying. However, for simplicity in display,
+    // we might just want to start it.
+    // Actually, to resume time, we need to handle it carefully.
+    // Since Stopwatch doesn't allow setting elapsed, we will use a separate variable
+    // or just rely on the fact that we save the TOTAL time (initial + current session).
+    _stopwatch.start();
+
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
   }
 
@@ -126,17 +149,35 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
         _selectedAnswerIndex = null;
         _isCurrentChoiceValidated = false;
       });
+      _saveCurrentState();
     }
   }
 
   Future<void> _saveProgress(double score) async {
     final db = await AppDb.instance.database;
+    final totalTimeSpent =
+        Duration(seconds: widget.initialTimeSpent) + _stopwatch.elapsed;
+
     await Repository(db: db).updateSeriesProgress(widget.series.id, score);
     await Repository(db: db).updateSeriesStats(
       DateTime.now(),
       widget.series.id,
       score,
-      _stopwatch.elapsed,
+      totalTimeSpent,
+    );
+    await Repository(db: db).resetSeriesState(widget.series.id);
+  }
+
+  Future<void> _saveCurrentState() async {
+    final db = await AppDb.instance.database;
+    final totalTimeSpent =
+        Duration(seconds: widget.initialTimeSpent) + _stopwatch.elapsed;
+
+    await Repository(db: db).saveSeriesState(
+      widget.series.id,
+      _currentQuestionIndex,
+      _selections,
+      totalTimeSpent.inSeconds,
     );
   }
 
@@ -171,7 +212,8 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
         builder: (context) => ResultPage(
           series: widget.series,
           selections: _selections,
-          duration: _stopwatch.elapsed,
+          duration:
+              Duration(seconds: widget.initialTimeSpent) + _stopwatch.elapsed,
         ),
       ),
     );
@@ -194,7 +236,10 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
                   const Icon(Icons.timer_outlined, size: 25),
                   const SizedBox(width: 4.0),
                   Text(
-                    formatDuration(_stopwatch.elapsed),
+                    formatDuration(
+                      Duration(seconds: widget.initialTimeSpent) +
+                          _stopwatch.elapsed,
+                    ),
                     style: AppTextStyles.medium16,
                   ),
                 ],
@@ -203,11 +248,13 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
           ],
           onClosePressed: () => yesNoDialog(
             context: context,
-            title: 'Souhaites-tu vraiment quitter\u00A0?',
-            content: 'Si tu quittes maintenant, ton progrès sera perdu.',
-            onYesPressed: (context) => {
-              Navigator.pop(context), // close dialog
-              Navigator.pop(context), // exit quiz
+            title: 'Souhaites-tu faire une pause\u00A0?',
+            content:
+                'Ton progrès sera sauvegardé et tu pourras reprendre plus tard.',
+            onYesPressed: (context) {
+              _saveCurrentState();
+              Navigator.pop(context); // close dialog
+              Navigator.pop(context); // exit quiz
             },
             onNoPressed: (context) => Navigator.pop(context), // close dialog
           ),

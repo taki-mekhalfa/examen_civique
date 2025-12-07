@@ -16,9 +16,18 @@ class ExamQuizPage extends StatefulWidget {
   final Series series;
   final Duration timeLimit;
   final List<Question> questions;
+  final int initialIndex;
+  final List<int> initialAnswers;
+  final int initialTimeSpent;
 
-  ExamQuizPage({super.key, required this.series, required this.timeLimit})
-    : questions = series.questions;
+  ExamQuizPage({
+    super.key,
+    required this.series,
+    required this.timeLimit,
+    this.initialIndex = 0,
+    this.initialAnswers = const [],
+    this.initialTimeSpent = 0,
+  }) : questions = series.questions;
 
   @override
   State<ExamQuizPage> createState() => _ExamQuizPageState();
@@ -54,8 +63,19 @@ class _ExamQuizPageState extends State<ExamQuizPage>
   }
 
   void _initializeQuiz() {
+    _currentQuestionIndex = widget.initialIndex;
     _selections = List<int>.filled(widget.questions.length, -1);
-    _remaining = widget.timeLimit;
+    for (int i = 0; i < widget.initialAnswers.length; i++) {
+      if (i < _selections.length) {
+        _selections[i] = widget.initialAnswers[i];
+      }
+    }
+
+    _remaining = widget.timeLimit - Duration(seconds: widget.initialTimeSpent);
+    if (_remaining.isNegative) {
+      _remaining = Duration.zero;
+    }
+
     _stopwatch = Stopwatch()..start();
     _timer = Timer.periodic(
       const Duration(seconds: 1),
@@ -170,17 +190,35 @@ class _ExamQuizPageState extends State<ExamQuizPage>
         _selectedAnswerIndex = null;
         _isCurrentChoiceValidated = false;
       });
+      _saveCurrentState();
     }
   }
 
   Future<void> _saveProgress(double score) async {
     final db = await AppDb.instance.database;
+    final totalTimeSpent =
+        Duration(seconds: widget.initialTimeSpent) + _stopwatch.elapsed;
+
     await Repository(db: db).updateSeriesProgress(widget.series.id, score);
     await Repository(db: db).updateSeriesStats(
       DateTime.now(),
       widget.series.id,
       score,
-      _stopwatch.elapsed,
+      totalTimeSpent,
+    );
+    await Repository(db: db).resetSeriesState(widget.series.id);
+  }
+
+  Future<void> _saveCurrentState() async {
+    final db = await AppDb.instance.database;
+    final totalTimeSpent =
+        Duration(seconds: widget.initialTimeSpent) + _stopwatch.elapsed;
+
+    await Repository(db: db).saveSeriesState(
+      widget.series.id,
+      _currentQuestionIndex,
+      _selections,
+      totalTimeSpent.inSeconds,
     );
   }
 
@@ -245,11 +283,13 @@ class _ExamQuizPageState extends State<ExamQuizPage>
           ],
           onClosePressed: () => yesNoDialog(
             context: context,
-            title: 'Souhaites-tu vraiment quitter\u00A0?',
-            content: 'Si tu quittes maintenant, ton progrès sera perdu.',
-            onYesPressed: (context) => {
-              Navigator.pop(context), // close dialog
-              Navigator.pop(context), // exit quiz
+            title: 'Souhaites-tu faire une pause\u00A0?',
+            content:
+                'Ton progrès sera sauvegardé et tu pourras reprendre plus tard.',
+            onYesPressed: (context) {
+              _saveCurrentState();
+              Navigator.pop(context); // close dialog
+              Navigator.pop(context); // exit quiz
             },
             onNoPressed: (context) => Navigator.pop(context), // close dialog
           ),

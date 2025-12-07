@@ -371,14 +371,74 @@ class SeriesList extends StatelessWidget {
 
     navigator.pop();
 
+    if (!context.mounted) return;
+
+    bool resume = false;
+    if (series.currentQuestionIndex > 0) {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text(
+            'Reprendre la série en cours\u00A0?',
+            style: AppTextStyles.medium20,
+            textAlign: TextAlign.center,
+          ),
+          content: const Text(
+            'Tu as déjà commencé cette série. Veux-tu reprendre là où tu t\'étais arrêté\u00A0?',
+            style: AppTextStyles.regular14,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'Recommencer',
+                style: AppTextStyles.medium16.copyWith(color: AppColors.red),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryNavyBlue,
+                elevation: 0.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+              ),
+              child: Text(
+                'Continuer',
+                style: AppTextStyles.medium16.copyWith(color: AppColors.white),
+              ),
+            ),
+          ],
+        ),
+      );
+      if (result == null) return;
+      resume = result;
+    }
+
+    if (!resume && series.currentQuestionIndex > 0) {
+      final db = await AppDb.instance.database;
+      await Repository(db: db).resetSeriesState(series.id);
+    }
+
     final quizPage = type == SeriesType.exam
         ? CountdownScreen(
             child: ExamQuizPage(
               series: fetchedSeries,
               timeLimit: _examTimeLimit,
+              initialIndex: resume ? series.currentQuestionIndex : 0,
+              initialAnswers: resume ? series.savedAnswers : [],
+              initialTimeSpent: resume ? series.timeSpentSecs : 0,
             ),
           )
-        : SimpleQuizPage(series: fetchedSeries);
+        : SimpleQuizPage(
+            series: fetchedSeries,
+            initialIndex: resume ? series.currentQuestionIndex : 0,
+            initialAnswers: resume ? series.savedAnswers : [],
+            initialTimeSpent: resume ? series.timeSpentSecs : 0,
+          );
 
     final route = type == SeriesType.exam
         ? centerFadeRoute(quizPage)
@@ -409,16 +469,18 @@ class _SeriesInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final double? last = series.lastScore;
     final double? best = series.bestScore;
-    final double progressValue = last ?? 0.0;
     final bool showBothBadges = last != null && best != null;
+    final double progressValue = series.totalQuestions > 0
+        ? series.currentQuestionIndex / series.totalQuestions
+        : 0.0;
 
     Widget badge(String label, double value) {
       final color = resultBarColor(value);
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         margin: const EdgeInsets.only(left: 6.0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(8.0),
           border: Border.all(color: AppColors.superSilver),
         ),
         child: Text(
@@ -433,7 +495,10 @@ class _SeriesInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6.0,
+            runSpacing: 4.0,
             children: [
               series.type == SeriesType.exam
                   ? Text(
@@ -441,13 +506,32 @@ class _SeriesInfo extends StatelessWidget {
                       style: AppTextStyles.regular15,
                     )
                   : Text(
-                      'Série simple\u00A0: ${series.position}',
+                      'Série\u00A0: ${series.position}',
                       style: AppTextStyles.regular15,
                     ),
               if (showBothBadges) ...[
                 badge('Dernier', last),
                 badge('Meilleur', best),
               ],
+              if (series.currentQuestionIndex > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                    vertical: 4.0,
+                  ),
+                  margin: const EdgeInsets.only(left: 6.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color: AppColors.primaryNavyBlue.withOpacity(0.1),
+                    border: Border.all(color: AppColors.primaryNavyBlue),
+                  ),
+                  child: Text(
+                    'En cours',
+                    style: AppTextStyles.medium12.copyWith(
+                      color: AppColors.primaryNavyBlue,
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 6.0),
@@ -456,7 +540,7 @@ class _SeriesInfo extends StatelessWidget {
             minHeight: 8.0,
             borderRadius: BorderRadius.circular(8.0),
             backgroundColor: AppColors.superSilver,
-            color: resultBarColor(progressValue),
+            color: AppColors.primaryNavyBlue,
           ),
         ],
       ),

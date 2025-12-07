@@ -140,6 +140,11 @@ class AppDb {
     last_score REAL,
     best_score REAL,
 
+    --- save state
+    current_question_index INTEGER DEFAULT 0,
+    saved_answers TEXT, -- JSON list of integers
+    time_spent_secs INTEGER DEFAULT 0,
+
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
   )
 ''';

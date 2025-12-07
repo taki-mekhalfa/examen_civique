@@ -12,12 +12,23 @@ class Repository {
   }
 
   Future<List<SeriesProgress>> getSeriesProgressByType(int type) async {
-    final seriesResult = await db.query(
-      'series',
-      columns: ['id', 'position', 'type', 'last_score', 'best_score'],
-      where: 'type = ?',
-      whereArgs: [type],
-      orderBy: 'position',
+    final seriesResult = await db.rawQuery(
+      '''
+      SELECT 
+        s.id, 
+        s.position, 
+        s.type, 
+        s.last_score, 
+        s.best_score, 
+        s.current_question_index, 
+        s.saved_answers, 
+        s.time_spent_secs,
+        (SELECT COUNT(*) FROM series_questions sq WHERE sq.series_id = s.id) as total_questions
+      FROM series s
+      WHERE s.type = ?
+      ORDER BY s.position
+    ''',
+      [type],
     );
 
     return seriesResult.map((s) => SeriesProgress.fromMap(s)).toList();
@@ -28,10 +39,44 @@ class Repository {
       '''
       UPDATE series
       SET last_score = ?,
-      best_score = MAX(COALESCE(best_score, 0), ?)
+      best_score = MAX(COALESCE(best_score, 0), ?),
+      current_question_index = 0,
+      saved_answers = NULL,
+      time_spent_secs = 0
       WHERE id = ?
       ''',
       [score, score, id],
+    );
+  }
+
+  Future<void> saveSeriesState(
+    int seriesId,
+    int index,
+    List<int> answers,
+    int timeSpent,
+  ) async {
+    await db.update(
+      'series',
+      {
+        'current_question_index': index,
+        'saved_answers': jsonEncode(answers),
+        'time_spent_secs': timeSpent,
+      },
+      where: 'id = ?',
+      whereArgs: [seriesId],
+    );
+  }
+
+  Future<void> resetSeriesState(int seriesId) async {
+    await db.update(
+      'series',
+      {
+        'current_question_index': 0,
+        'saved_answers': null,
+        'time_spent_secs': 0,
+      },
+      where: 'id = ?',
+      whereArgs: [seriesId],
     );
   }
 
@@ -238,6 +283,10 @@ class SeriesProgress {
   final int position;
   final double? lastScore;
   final double? bestScore;
+  final int currentQuestionIndex;
+  final List<int> savedAnswers;
+  final int timeSpentSecs;
+  final int totalQuestions;
 
   SeriesProgress({
     required this.id,
@@ -245,15 +294,28 @@ class SeriesProgress {
     required this.position,
     required this.lastScore,
     required this.bestScore,
+    required this.currentQuestionIndex,
+    required this.savedAnswers,
+    required this.timeSpentSecs,
+    required this.totalQuestions,
   });
 
   factory SeriesProgress.fromMap(Map<String, Object?> r) {
+    final savedAnswersJson = r['saved_answers'] as String?;
+    final savedAnswers = savedAnswersJson != null
+        ? List<int>.from(jsonDecode(savedAnswersJson))
+        : <int>[];
+
     return SeriesProgress(
       id: r['id'] as int,
       type: SeriesType.values[r['type'] as int],
       position: r['position'] as int,
       lastScore: (r['last_score'] as num?)?.toDouble(),
       bestScore: (r['best_score'] as num?)?.toDouble(),
+      currentQuestionIndex: (r['current_question_index'] as int?) ?? 0,
+      savedAnswers: savedAnswers,
+      timeSpentSecs: (r['time_spent_secs'] as int?) ?? 0,
+      totalQuestions: (r['total_questions'] as int?) ?? 0,
     );
   }
 }
