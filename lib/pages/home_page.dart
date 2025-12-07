@@ -74,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             _buildHeader(),
             _buildSimpleSeriesTile(context),
             _buildExamsTile(context),
+            _buildThematicSeriesTile(context),
             _buildErrorsTile(context),
             _buildStatisticsTile(context),
             _buildAboutTile(context),
@@ -123,6 +124,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         type: SeriesType.exam,
         title: 'Examens blancs',
       ),
+    );
+  }
+
+  Widget _buildThematicSeriesTile(BuildContext context) {
+    return HomeTile(
+      title: 'Séries thématiques',
+      subtitle: "Mode thématique\u00A0: Questions regroupées par thème.",
+      imagePath: 'assets/images/examen_thematique.png',
+      onTap: () => {},
     );
   }
 
