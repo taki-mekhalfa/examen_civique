@@ -101,6 +101,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Widget _buildSimpleSeriesTile(BuildContext context) {
     return HomeTile(
       title: 'Séries simples',
+      subtitle:
+          "Mode entraînement\u00A0: 40 questions, sans limite de temps, correction immédiate.",
       imagePath: 'assets/images/serie_simple.png',
       onTap: () => _navigateToSeriesList(
         context,
@@ -113,6 +115,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Widget _buildExamsTile(BuildContext context) {
     return HomeTile(
       title: 'Examens blancs',
+      subtitle:
+          "Mode examen\u00A0: 40 questions, 45 minutes, correction en fin de série.",
       imagePath: 'assets/images/examen_blanc.png',
       onTap: () => _navigateToSeriesList(
         context,
@@ -431,7 +435,15 @@ class _SeriesInfo extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text('Série ${series.position}', style: AppTextStyles.regular15),
+              series.type == SeriesType.exam
+                  ? Text(
+                      'Examen\u00A0: ${series.position}',
+                      style: AppTextStyles.regular15,
+                    )
+                  : Text(
+                      'Série simple\u00A0: ${series.position}',
+                      style: AppTextStyles.regular15,
+                    ),
               if (showBothBadges) ...[
                 badge('Dernier', last),
                 badge('Meilleur', best),

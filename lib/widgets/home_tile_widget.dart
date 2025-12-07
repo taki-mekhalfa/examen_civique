@@ -6,12 +6,14 @@ class HomeTile extends StatelessWidget {
   const HomeTile({
     super.key,
     required this.title,
+    this.subtitle,
     this.imagePath,
     this.trailing,
     this.onTap,
   });
 
   final String title;
+  final String? subtitle;
   final String? imagePath;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -38,18 +40,37 @@ class HomeTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                if (imagePath != null)
-                  Image.asset(imagePath!, height: 55.0, width: 55.0),
-                SizedBox(width: 16.0),
-                Text(title, style: AppTextStyles.regular18),
-              ],
+            Expanded(
+              child: Row(
+                children: [
+                  if (imagePath != null)
+                    Image.asset(imagePath!, height: 55.0, width: 55.0),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: AppTextStyles.regular18),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 4.0),
+                          Text(
+                            subtitle!,
+                            style: AppTextStyles.regular12.copyWith(
+                              color: AppColors.grey425,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             Row(
               children: [
                 trailing ?? const SizedBox.shrink(),
-                Icon(
+                const SizedBox(width: 8.0),
+                const Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: AppColors.primaryNavyBlue,
                   size: 20,

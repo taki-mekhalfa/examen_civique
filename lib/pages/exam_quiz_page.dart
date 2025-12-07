@@ -225,7 +225,7 @@ class _ExamQuizPageState extends State<ExamQuizPage>
       child: Scaffold(
         appBar: QuizAppBar(
           title:
-              'Série ${widget.series.id} - Q${_currentQuestionIndex + 1}/${widget.questions.length}',
+              'Examen ${widget.series.id} - Q${_currentQuestionIndex + 1}/${widget.questions.length}',
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16.0),

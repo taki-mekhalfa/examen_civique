@@ -184,7 +184,7 @@ class _SimpleQuizPageState extends State<SimpleQuizPage>
       child: Scaffold(
         appBar: QuizAppBar(
           title:
-              'Série ${widget.series.id} - Q${_currentQuestionIndex + 1}/${widget.questions.length}',
+              'Série simple ${widget.series.id} - Q${_currentQuestionIndex + 1}/${widget.questions.length}',
           progress: _progress,
           actions: [
             Padding(
