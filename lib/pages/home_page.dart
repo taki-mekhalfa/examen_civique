@@ -9,6 +9,7 @@ import 'package:examen_civique/pages/exam_quiz_page.dart';
 import 'package:examen_civique/pages/legal_notice_page.dart';
 import 'package:examen_civique/pages/simple_quiz_page.dart';
 import 'package:examen_civique/pages/statistics_page.dart';
+import 'package:examen_civique/pages/thematic_selection_page.dart';
 import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/bottom_fade.dart';
@@ -132,7 +133,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       title: 'Séries thématiques',
       subtitle: "Mode thématique\u00A0: Questions regroupées par thème.",
       imagePath: 'assets/images/examen_thematique.png',
-      onTap: () => {},
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ThematicSelectionPage()),
+      ),
     );
   }
 
