@@ -243,8 +243,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 class SeriesListScreen extends StatefulWidget {
   final SeriesType type;
   final String title;
+  final String? topic;
 
-  const SeriesListScreen({super.key, required this.type, required this.title});
+  const SeriesListScreen({
+    super.key,
+    required this.type,
+    required this.title,
+    this.topic,
+  });
 
   @override
   State<SeriesListScreen> createState() => _SeriesListScreenState();
@@ -253,6 +259,11 @@ class SeriesListScreen extends StatefulWidget {
 class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
   Future<List<SeriesProgress>> _fetchSeries() async {
     final db = await AppDb.instance.database;
+    if (widget.topic != null) {
+      return Repository(
+        db: db,
+      ).getSeriesProgressByTypeAndTopic(widget.type.value, widget.topic!);
+    }
     return Repository(db: db).getSeriesProgressByType(widget.type.value);
   }
 

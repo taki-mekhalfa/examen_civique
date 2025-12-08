@@ -1,4 +1,4 @@
-enum SeriesType { simple, exam }
+enum SeriesType { simple, exam, thematic }
 
 extension SeriesTypeExtension on SeriesType {
   int get value {
@@ -7,6 +7,8 @@ extension SeriesTypeExtension on SeriesType {
         return 0;
       case SeriesType.exam:
         return 1;
+      case SeriesType.thematic:
+        return 2;
     }
   }
 }

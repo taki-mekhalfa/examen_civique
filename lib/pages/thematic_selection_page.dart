@@ -1,5 +1,6 @@
 import 'package:examen_civique/design/style/app_colors.dart';
 
+import 'package:examen_civique/models/series.dart';
 import 'package:examen_civique/pages/home_page.dart';
 import 'package:examen_civique/widgets/home_tile_widget.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,16 @@ class ThematicSelectionPage extends StatelessWidget {
       title: title,
       imagePath: imagePath,
       onTap: () {
-        // TODO: Implement navigation to quiz for this topic
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SeriesListScreen(
+              type: SeriesType.thematic,
+              title: title,
+              topic: title,
+            ),
+          ),
+        );
       },
     );
   }

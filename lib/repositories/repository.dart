@@ -18,6 +18,7 @@ class Repository {
         s.id, 
         s.position, 
         s.type, 
+        s.topic,
         s.last_score, 
         s.best_score, 
         s.current_question_index, 
@@ -29,6 +30,33 @@ class Repository {
       ORDER BY s.position
     ''',
       [type],
+    );
+
+    return seriesResult.map((s) => SeriesProgress.fromMap(s)).toList();
+  }
+
+  Future<List<SeriesProgress>> getSeriesProgressByTypeAndTopic(
+    int type,
+    String topic,
+  ) async {
+    final seriesResult = await db.rawQuery(
+      '''
+      SELECT 
+        s.id, 
+        s.position, 
+        s.type, 
+        s.topic,
+        s.last_score, 
+        s.best_score, 
+        s.current_question_index, 
+        s.saved_answers, 
+        s.time_spent_secs,
+        (SELECT COUNT(*) FROM series_questions sq WHERE sq.series_id = s.id) as total_questions
+      FROM series s
+      WHERE s.type = ? AND s.topic = ?
+      ORDER BY s.position
+    ''',
+      [type, topic],
     );
 
     return seriesResult.map((s) => SeriesProgress.fromMap(s)).toList();
@@ -280,6 +308,7 @@ class Repository {
 class SeriesProgress {
   final int id;
   final SeriesType type;
+  final String? topic;
   final int position;
   final double? lastScore;
   final double? bestScore;
@@ -291,6 +320,7 @@ class SeriesProgress {
   SeriesProgress({
     required this.id,
     required this.type,
+    this.topic,
     required this.position,
     required this.lastScore,
     required this.bestScore,
@@ -309,6 +339,7 @@ class SeriesProgress {
     return SeriesProgress(
       id: r['id'] as int,
       type: SeriesType.values[r['type'] as int],
+      topic: r['topic'] as String?,
       position: r['position'] as int,
       lastScore: (r['last_score'] as num?)?.toDouble(),
       bestScore: (r['best_score'] as num?)?.toDouble(),

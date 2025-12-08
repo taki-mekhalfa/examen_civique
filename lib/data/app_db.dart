@@ -83,13 +83,14 @@ class AppDb {
       for (final s in series) {
         batch.rawInsert(
           '''
-          INSERT INTO series (id, type, position)
-          VALUES (?, ?, ?)
+          INSERT INTO series (id, type, topic, position)
+          VALUES (?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             type = excluded.type,
+            topic = excluded.topic,
             position = excluded.position
           ''',
-          [s['id'], s['type'], s['position']],
+          [s['id'], s['type'], s['topic'], s['position']],
         );
 
         int questionPosition = 1;
@@ -134,7 +135,8 @@ class AppDb {
   static const String _seriesTable = '''
   CREATE TABLE series (
     id INTEGER PRIMARY KEY,
-    type INTEGER NOT NULL CHECK (type IN (0, 1)), -- 0 = simple, 1 = exam
+    type INTEGER NOT NULL CHECK (type IN (0, 1, 2)), -- 0 = simple, 1 = exam, 2 = thematics
+    topic TEXT NULL, -- only for thematics
     position INTEGER NOT NULL,
     --- progress indicators
     last_score REAL,
