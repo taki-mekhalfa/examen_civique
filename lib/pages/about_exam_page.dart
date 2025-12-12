@@ -95,9 +95,15 @@ class AboutExamPage extends StatelessWidget {
                     children: [
                       _CheckRow(text: "Demande de naturalisation"),
                       const Divider(height: 20, thickness: 2.0),
-                      _CheckRow(text: "Carte de résident (10 ans)"),
+                      _CheckRow(
+                        text: "Première carte de séjour pluriannuelle (CSP)",
+                      ),
                       const Divider(height: 20, thickness: 2.0),
-                      _CheckRow(text: "Carte de séjour pluriannuelle"),
+                      _CheckRow(text: "Première carte de résident (CR)"),
+                      const Divider(height: 20, thickness: 2.0),
+                      _CheckRow(
+                        text: "Obligatoire à partir du 1er janvier 2026",
+                      ),
                     ],
                   ),
                 ),
@@ -124,26 +130,21 @@ class AboutExamPage extends StatelessWidget {
                           text: "questions de mise en situation",
                           style: AppTextStyles.bold14,
                         ),
-                        const TextSpan(text: " sont fondés sur le "),
+                        const TextSpan(text: " sont issus des "),
                         TextSpan(
-                          text: "Livret du citoyen",
+                          text: "listes officielles",
                           style: AppTextStyles.bold14.copyWith(
                             fontStyle: FontStyle.italic,
                           ),
                         ),
-                        const TextSpan(text: ", les "),
+                        const TextSpan(text: " publiées par le "),
                         TextSpan(
-                          text: "réformes récentes",
-                          style: AppTextStyles.bold14,
-                        ),
-                        const TextSpan(text: " et les "),
-                        TextSpan(
-                          text: "retours d’expérience des candidats",
+                          text: "Ministère de l'Intérieur",
                           style: AppTextStyles.bold14,
                         ),
                         const TextSpan(
                           text:
-                              ", afin d’offrir une préparation complète et réaliste.",
+                              ", afin d’offrir une préparation complète, réaliste et conforme à l'examen.",
                         ),
                       ],
                     ),
@@ -154,6 +155,22 @@ class AboutExamPage extends StatelessWidget {
 
               // --- Section: The Programme (Detailed breakdown) ---
               _SectionHeader(title: "Le programme officiel"),
+              GestureDetector(
+                onTap: () => launchUrl(
+                  Uri.parse(
+                    "https://formation-civique.interieur.gouv.fr/examen-civique/informations-g%C3%A9n%C3%A9rales-sur-lexamen-civique/",
+                  ),
+                ),
+                child: Text(
+                  "Voir les infos officielles complètes",
+                  style: AppTextStyles.medium14.copyWith(
+                    color: AppColors.primaryNavyBlue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
               GestureDetector(
                 onTap: () => launchUrl(
                   Uri.parse(
@@ -168,7 +185,7 @@ class AboutExamPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text.rich(
                 TextSpan(
                   text: "L'examen comporte ",
@@ -260,14 +277,28 @@ class AboutExamPage extends StatelessWidget {
                         icon: Icons.computer_rounded,
                         title: "Support numérique",
                         desc:
-                            "L'épreuve se passe sur une tablette ou un ordinateur.",
+                            "L'épreuve se passe sur une tablette ou un ordinateur (45 min max).",
+                      ),
+                      const SizedBox(height: 16),
+                      _RuleRow(
+                        icon: Icons.pie_chart_outline_rounded,
+                        title: "Structure du QCM",
+                        desc:
+                            "28 questions de connaissance et 12 questions de mise en situation.",
+                      ),
+                      const SizedBox(height: 16),
+                      _RuleRow(
+                        icon: Icons.bar_chart_rounded,
+                        title: "Niveaux",
+                        desc:
+                            "Deux niveaux de difficulté selon le titre visé : CSP ou CR.",
                       ),
                       const SizedBox(height: 16),
                       _RuleRow(
                         icon: Icons.exposure_plus_1_rounded,
                         title: "Notation",
                         desc:
-                            "1 point par bonne réponse. 0 point par erreur. Pas de points négatifs.",
+                            "1 point par bonne réponse. Pas de points négatifs. 32/40 requis (80%).",
                       ),
                       const SizedBox(height: 16),
                       _RuleRow(
@@ -280,6 +311,40 @@ class AboutExamPage extends StatelessWidget {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 24),
+
+              // --- Section: Registration & Validity ---
+              _SectionHeader(title: "Inscription et validité"),
+              Card(
+                elevation: 1.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _RuleRow(
+                        icon: Icons.domain_rounded,
+                        title: "Organismes agréés",
+                        desc:
+                            "L'examen se passe auprès de la CCIP ou de France Éducation International (FEI).",
+                      ),
+                      const SizedBox(height: 16),
+                      _RuleRow(
+                        icon: Icons.update_rounded,
+                        title: "Validité",
+                        desc:
+                            "L'attestation de réussite est valable à vie. Nombre de tentatives illimité.",
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
 
               const SizedBox(height: 40),
 
