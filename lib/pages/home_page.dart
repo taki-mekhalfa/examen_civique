@@ -205,18 +205,32 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Widget _buildLegalNoticeLink(BuildContext context) {
     return Center(
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const LegalNoticePage()),
-        ),
-        child: Text(
-          "Conditions d'utilisation",
-          style: AppTextStyles.regular12.copyWith(
-            color: AppColors.grey425,
-            decoration: TextDecoration.underline,
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LegalNoticePage()),
+            ),
+            child: Text(
+              "Conditions d'utilisation",
+              style: AppTextStyles.regular12.copyWith(
+                color: AppColors.grey425,
+                decoration: TextDecoration.underline,
+              ),
+            ),
           ),
-        ),
+          const SizedBox(height: 20),
+          Text(
+            "Développé par Taki Mekhalfa",
+            style: AppTextStyles.medium12.copyWith(color: AppColors.grey425),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Soutenu par Ghiles Meddour",
+            style: AppTextStyles.medium12.copyWith(color: AppColors.grey425),
+          ),
+        ],
       ),
     );
   }
