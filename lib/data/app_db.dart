@@ -58,15 +58,16 @@ class AppDb {
       for (final q in questions) {
         batch.rawInsert(
           '''
-          INSERT INTO questions (id, text, choices, answer, explanation, topic, subtopic)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO questions (id, text, choices, answer, explanation, topic, subtopic, level)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             text = excluded.text,
             choices = excluded.choices,
             answer = excluded.answer,
             explanation = excluded.explanation,
             topic = excluded.topic,
-            subtopic = excluded.subtopic
+            subtopic = excluded.subtopic,
+            level = excluded.level
           ''',
           [
             q['id'],
@@ -76,6 +77,7 @@ class AppDb {
             q['explanation'],
             q['topic'],
             q['subtopic'],
+            q['level'],
           ],
         );
       }
@@ -159,7 +161,8 @@ class AppDb {
     answer INTEGER NOT NULL,
     explanation TEXT NOT NULL,
     topic TEXT NOT NULL,
-    subtopic TEXT NOT NULL
+    subtopic TEXT NOT NULL,
+    level TEXT
   )
 ''';
 

@@ -129,6 +129,7 @@ class Repository {
         explanation: q['explanation'] as String,
         topic: q['topic'] as String,
         subtopic: q['subtopic'] as String,
+        level: q['level'] as String?,
       );
     }).toList();
   }
@@ -171,6 +172,7 @@ class Repository {
         explanation: q['explanation'] as String,
         topic: q['topic'] as String,
         subtopic: q['subtopic'] as String,
+        level: q['level'] as String?,
       );
     }).toList();
   }

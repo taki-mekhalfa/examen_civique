@@ -80,23 +80,49 @@ class QuestionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Topic
-              DecoratedBox(
-                decoration: const BoxDecoration(
-                  color: AppColors.primaryNavyBlue,
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 6,
-                  ),
-                  child: Text(
-                    question.topic,
-                    style: AppTextStyles.regular13.copyWith(
-                      color: Colors.white,
+              // Topic and Level
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: [
+                  DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: AppColors.primaryNavyBlue,
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
+                      child: Text(
+                        question.topic,
+                        style: AppTextStyles.regular13.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  if (question.level != null)
+                    DecoratedBox(
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryNavyBlue,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        child: Text(
+                          'Niveau\u00A0: ${question.level}',
+                          style: AppTextStyles.regular13.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 5.0),
               DecoratedBox(
