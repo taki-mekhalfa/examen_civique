@@ -59,12 +59,12 @@ class ErrorsPage extends StatelessWidget {
                       vertical: 24,
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(
-                          child: _ContentCard(
-                            nbErrors: nbErrors,
-                            colorScheme: colorScheme,
-                          ),
+                        _ContentCard(
+                          nbErrors: nbErrors,
+                          colorScheme: colorScheme,
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
