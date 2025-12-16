@@ -50,55 +50,59 @@ class ErrorsPage extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 24,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _ContentCard(
-                          nbErrors: nbErrors,
-                          colorScheme: colorScheme,
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () => {
-                            yesNoDialog(
-                              context: context,
-                              title:
-                                  'Souhaites-tu réinitialiser ton compteur\u00A0?',
-                              content:
-                                  'Ton compteur d\'erreurs sera remis à zéro.',
-                              onYesPressed: (context) =>
-                                  _handleResetCounter(context),
-                              onNoPressed: (context) => Navigator.pop(context),
+              child: Container(
+                color: AppColors.primaryGreyLight,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 24,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _ContentCard(
+                            nbErrors: nbErrors,
+                            colorScheme: colorScheme,
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () => {
+                              yesNoDialog(
+                                context: context,
+                                title:
+                                    'Souhaites-tu réinitialiser ton compteur\u00A0?',
+                                content:
+                                    'Ton compteur d\'erreurs sera remis à zéro.',
+                                onYesPressed: (context) =>
+                                    _handleResetCounter(context),
+                                onNoPressed: (context) =>
+                                    Navigator.pop(context),
+                              ),
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryNavyBlue,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
                             ),
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryNavyBlue,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
+                            child: Text(
+                              'Réinitialiser mon compteur',
+                              style: AppTextStyles.medium16.copyWith(
+                                color: AppColors.white,
+                              ),
                             ),
                           ),
-                          child: Text(
-                            'Réinitialiser mon compteur',
-                            style: AppTextStyles.medium16.copyWith(
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
