@@ -45,13 +45,13 @@ class ErrorsPage extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
+      backgroundColor: AppColors.primaryGreyLight,
       appBar: buildAppBar('Mes erreurs'),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
               child: Container(
-                color: AppColors.primaryGreyLight,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
