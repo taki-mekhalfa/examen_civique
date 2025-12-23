@@ -32,7 +32,7 @@ class AppDb {
 
     return await openDatabase(
       dbPath,
-      version: 5,
+      version: 6,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
         await db.rawQuery('PRAGMA journal_mode = WAL');
