@@ -11,14 +11,26 @@ class Repository {
     return DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
   }
 
-  Future<List<SeriesProgress>> getSeriesProgressByType(int type) async {
-    final seriesResult = await db.rawQuery(
-      '''
+  Future<List<SeriesProgress>> getSeriesProgressByType(
+    int type, {
+    String? level,
+  }) async {
+    // Build the query dynamically based on whether level is present
+    final StringBuffer whereClause = StringBuffer('s.type = ?');
+    final List<Object?> args = [type];
+
+    if (level != null) {
+      whereClause.write(' AND s.level = ?');
+      args.add(level);
+    }
+
+    final seriesResult = await db.rawQuery('''
       SELECT 
         s.id, 
         s.position, 
         s.type, 
         s.topic,
+        s.level, -- Added level column
         s.last_score, 
         s.best_score, 
         s.current_question_index, 
@@ -26,11 +38,9 @@ class Repository {
         s.time_spent_secs,
         (SELECT COUNT(*) FROM series_questions sq WHERE sq.series_id = s.id) as total_questions
       FROM series s
-      WHERE s.type = ?
+      WHERE ${whereClause.toString()}
       ORDER BY s.position
-    ''',
-      [type],
-    );
+    ''', args);
 
     return seriesResult.map((s) => SeriesProgress.fromMap(s)).toList();
   }
@@ -46,6 +56,7 @@ class Repository {
         s.position, 
         s.type, 
         s.topic,
+        s.level,
         s.last_score, 
         s.best_score, 
         s.current_question_index, 
@@ -250,8 +261,6 @@ class Repository {
     final seriesResult = results[2];
 
     // 2. Pre-process results into Maps for O(1) lookup
-    // Note: If multiple entries exist for the same date, this logic
-    // keeps the last one (matching your original logic).
     final topicsMap = <String, TopicStatistics>{};
     for (final t in topicsResult) {
       final correct = t['correct_count'] as int;
@@ -311,6 +320,7 @@ class SeriesProgress {
   final int id;
   final SeriesType type;
   final String? topic;
+  final String? level; // Added field
   final int position;
   final double? lastScore;
   final double? bestScore;
@@ -323,6 +333,7 @@ class SeriesProgress {
     required this.id,
     required this.type,
     this.topic,
+    this.level, // Added to constructor
     required this.position,
     required this.lastScore,
     required this.bestScore,
@@ -342,6 +353,7 @@ class SeriesProgress {
       id: r['id'] as int,
       type: SeriesType.values[r['type'] as int],
       topic: r['topic'] as String?,
+      level: r['level'] as String?,
       position: r['position'] as int,
       lastScore: (r['last_score'] as num?)?.toDouble(),
       bestScore: (r['best_score'] as num?)?.toDouble(),

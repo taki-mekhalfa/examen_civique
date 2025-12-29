@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:developer' as developer;
+
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
 import 'package:examen_civique/design/style/app_text_styles.dart';
@@ -18,6 +21,8 @@ import 'package:examen_civique/widgets/errors_badge.dart';
 import 'package:examen_civique/widgets/home_tile_widget.dart';
 import 'package:examen_civique/widgets/screen_loader.dart';
 import 'package:flutter/material.dart';
+
+enum _ViewMode { nat, tds }
 
 const _examTimeLimit = Duration(minutes: 45);
 
@@ -271,22 +276,35 @@ class SeriesListScreen extends StatefulWidget {
 }
 
 class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
-  Future<List<SeriesProgress>> _fetchSeries() async {
+  _ViewMode _viewMode = _ViewMode.nat;
+
+  Future<List<SeriesProgress>> _fetchSeries(String? level) async {
     final db = await AppDb.instance.database;
     if (widget.topic != null) {
+      // For Thematic, we might not need level filtering yet, or if we do, update repository similarly
+      // But assuming request is for Series Simple and Exam mainly
       return Repository(
         db: db,
       ).getSeriesProgressByTypeAndTopic(widget.type.value, widget.topic!);
     }
-    return Repository(db: db).getSeriesProgressByType(widget.type.value);
+    return Repository(
+      db: db,
+    ).getSeriesProgressByType(widget.type.value, level: level);
   }
 
-  late Future<List<SeriesProgress>> _series;
+  late Future<List<SeriesProgress>>? _seriesThematics;
+  late Future<List<SeriesProgress>>? _seriesNat;
+  late Future<List<SeriesProgress>>? _seriesTds;
 
   @override
   void initState() {
     super.initState();
-    _series = retryForever(() => _fetchSeries());
+    if (widget.topic != null) {
+      _seriesThematics = retryForever(() => _fetchSeries(null));
+    } else {
+      _seriesNat = retryForever(() => _fetchSeries("NAT"));
+      _seriesTds = retryForever(() => _fetchSeries("TDS"));
+    }
   }
 
   @override
@@ -306,9 +324,16 @@ class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    setState(() {
-      _series = retryForever(() => _fetchSeries());
-    });
+    if (widget.topic != null) {
+      setState(() {
+        _seriesThematics = retryForever(() => _fetchSeries(null));
+      });
+    } else {
+      setState(() {
+        _seriesNat = retryForever(() => _fetchSeries("NAT"));
+        _seriesTds = retryForever(() => _fetchSeries("TDS"));
+      });
+    }
   }
 
   @override
@@ -317,19 +342,43 @@ class _SeriesListScreenState extends State<SeriesListScreen> with RouteAware {
       backgroundColor: AppColors.primaryGreyLight,
       appBar: buildAppBar(widget.title),
       body: SafeArea(
-        child: FutureBuilder<List<SeriesProgress>>(
-          future: _series,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const DialogScreenLoader();
-            }
-            return Stack(
-              children: [
-                SeriesList(seriesProgress: snapshot.data!, type: widget.type),
-                const BottomFade(),
-              ],
-            );
-          },
+        child: Column(
+          children: [
+            if (widget.type != SeriesType.thematic)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: _ModeToggle(
+                  mode: _viewMode,
+                  onChanged: (m) => setState(() {
+                    _viewMode = m;
+                  }),
+                ),
+              ),
+            FutureBuilder(
+              future: widget.topic != null
+                  ? _seriesThematics
+                  : (_viewMode == _ViewMode.nat ? _seriesNat : _seriesTds),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const DialogScreenLoader();
+                }
+                return Expanded(
+                  child: Stack(
+                    children: [
+                      SeriesList(
+                        seriesProgress: snapshot.data!,
+                        type: widget.type,
+                      ),
+                      const BottomFade(),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -693,4 +742,78 @@ void _showNoErrorsDialog(BuildContext context) {
       ],
     ),
   );
+}
+
+class _ModeToggle extends StatefulWidget {
+  final _ViewMode mode;
+  final ValueChanged<_ViewMode> onChanged;
+  const _ModeToggle({required this.mode, required this.onChanged});
+  @override
+  State<_ModeToggle> createState() => _ModeToggleState();
+}
+
+class _ModeToggleState extends State<_ModeToggle> {
+  @override
+  Widget build(BuildContext context) {
+    final bool isNAT = widget.mode == _ViewMode.nat;
+
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: AppColors.superSilver,
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+      padding: const EdgeInsets.all(4.0),
+      child: Stack(
+        children: [
+          AnimatedAlign(
+            alignment: isNAT ? Alignment.centerLeft : Alignment.centerRight,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOutCubic,
+            child: FractionallySizedBox(
+              widthFactor: 0.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.primaryNavyBlue,
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () => setState(() => widget.onChanged(_ViewMode.nat)),
+                  child: Center(
+                    child: Text(
+                      'Naturalisation',
+                      style: AppTextStyles.bold14.copyWith(
+                        color: isNAT ? AppColors.white : AppColors.primaryGrey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () => setState(() => widget.onChanged(_ViewMode.tds)),
+                  child: Center(
+                    child: Text(
+                      'Carte Séjour',
+                      style: AppTextStyles.bold14.copyWith(
+                        color: !isNAT ? AppColors.white : AppColors.primaryGrey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

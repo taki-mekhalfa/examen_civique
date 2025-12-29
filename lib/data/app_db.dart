@@ -32,7 +32,7 @@ class AppDb {
 
     return await openDatabase(
       dbPath,
-      version: 6,
+      version: 7,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
         await db.rawQuery('PRAGMA journal_mode = WAL');
@@ -41,7 +41,10 @@ class AppDb {
         await _createSchema(db);
         await _seedData(db);
       },
-      onUpgrade: (db, _, _) async {
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 7) {
+          await db.execute('ALTER TABLE series ADD COLUMN level TEXT');
+        }
         await _seedData(db);
       },
     );
@@ -88,14 +91,15 @@ class AppDb {
       for (final s in series) {
         batch.rawInsert(
           '''
-          INSERT INTO series (id, type, topic, position)
-          VALUES (?, ?, ?, ?)
+          INSERT INTO series (id, type, topic, position, level)
+          VALUES (?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             type = excluded.type,
             topic = excluded.topic,
-            position = excluded.position
+            position = excluded.position,
+            level = excluded.level
           ''',
-          [s['id'], s['type'], s['topic'], s['position']],
+          [s['id'], s['type'], s['topic'], s['position'], s['level']],
         );
 
         int questionPosition = 1;
@@ -143,6 +147,7 @@ class AppDb {
     type INTEGER NOT NULL CHECK (type IN (0, 1, 2)), -- 0 = simple, 1 = exam, 2 = thematics
     topic TEXT NULL, -- only for thematics
     position INTEGER NOT NULL,
+    level TEXT,
     --- progress indicators
     last_score REAL,
     best_score REAL,
