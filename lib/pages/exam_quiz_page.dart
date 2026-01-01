@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
@@ -160,6 +161,7 @@ class _ExamQuizPageState extends State<ExamQuizPage>
 
   Future<void> _continueOrShake() async {
     if (_selectedAnswerIndex == null) {
+      await HapticFeedback.heavyImpact();
       _shakeKey.currentState?.shake();
       return;
     }

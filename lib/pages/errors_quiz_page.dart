@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'package:flutter/services.dart';
 
 import 'package:examen_civique/data/app_db.dart';
 import 'package:examen_civique/design/style/app_colors.dart';
@@ -52,6 +53,7 @@ class _ErrorsQuizState extends State<ErrorsQuiz> {
 
   Future<void> _validateCurrentChoiceOrShake() async {
     if (_selectedAnswerIndex == null) {
+      await HapticFeedback.heavyImpact();
       _shakeKey.currentState?.shake();
       return;
     }
