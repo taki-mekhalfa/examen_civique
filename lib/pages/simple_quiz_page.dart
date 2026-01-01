@@ -9,6 +9,7 @@ import 'package:examen_civique/repositories/repository.dart';
 import 'package:examen_civique/utils/utils.dart';
 import 'package:examen_civique/widgets/bottom_fade.dart';
 import 'package:examen_civique/widgets/question.dart';
+import 'package:examen_civique/widgets/report_problem.dart';
 import 'package:examen_civique/widgets/screen_loader.dart';
 import 'package:examen_civique/widgets/shake_widget.dart';
 import 'package:flutter/material.dart';
@@ -367,6 +368,21 @@ class QuestionSection extends StatelessWidget {
                 showCorrection: showCorrection,
               ),
             ),
+            Center(
+              child: TextButton.icon(
+                onPressed: () => showReportProblemDialog(context, question),
+                icon: const Icon(
+                  Icons.flag_rounded,
+                  size: 20,
+                  color: AppColors.primaryGrey,
+                ),
+                label: Text(
+                  'Signaler un problème',
+                  style: AppTextStyles.regular13,
+                ),
+              ),
+            ),
+            const SizedBox(height: 50),
           ],
         ),
         const BottomFade(),
