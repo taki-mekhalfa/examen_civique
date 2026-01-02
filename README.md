@@ -4,4 +4,4 @@ TODO
 
 ## Acknowledgments
 
-Special thanks to https://github.com/ghilesmeddour for sponsoring this project.
+Special thanks to [Ghiles Meddour](https://github.com/ghilesmeddour) for sponsoring this project.
