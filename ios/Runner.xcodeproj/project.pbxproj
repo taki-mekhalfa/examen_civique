@@ -481,7 +481,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 49ZHT52S8Y;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 1.6.0;
+				FLUTTER_BUILD_NAME = 1.7.0;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Examen Civique";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
@@ -489,7 +489,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.takimekhalfa.examenCivique;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -675,7 +675,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 49ZHT52S8Y;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 1.6.0;
+				FLUTTER_BUILD_NAME = 1.7.0;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Examen Civique";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
@@ -683,7 +683,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.takimekhalfa.examenCivique;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -707,7 +707,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 49ZHT52S8Y;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 1.6.0;
+				FLUTTER_BUILD_NAME = 1.7.0;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Examen Civique";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
@@ -715,7 +715,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = fr.takimekhalfa.examenCivique;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
