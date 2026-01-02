@@ -86,7 +86,7 @@ class _ResultPageState extends State<ResultPage> {
         toolbarHeight: _toolbarHeight,
         centerTitle: true,
         title: Text(
-          'Série ${widget.series.id} - Résultats',
+          'Série ${widget.series.position} - Résultats',
           style: AppTextStyles.regular18,
         ),
         leading: IconButton(
